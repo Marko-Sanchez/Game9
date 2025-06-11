@@ -12,3 +12,11 @@ set(SOURCE src/main.cpp)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(game9 ${SOURCE})
+
+target_link_libraries(game9
+    glfw
+    GLEW
+    GL
+    X11
+    GLU
+)
