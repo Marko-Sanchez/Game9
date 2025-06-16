@@ -18,10 +18,10 @@ private:
     std::shared_ptr<GLFWwindow> m_window;
 
     // callbacks.
+    void ProcessWindowSizeCallback(int width, int height);
     void ProcessKeyboardCallback(int key, int scancode, int action, int mods);
     void ProcessMouseCallback(double xPosIn, double yPosIn);
     void ProcessMouseScrollCallback(double xPosIn, double yPosIn);
-    void ProcessWindowSizeCallback(int width, int height);
 
 public:
     Window(std::shared_ptr<GLFWwindow> window, int width, int height);
