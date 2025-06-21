@@ -23,7 +23,7 @@ public:
     Texture2D();
     ~Texture2D();
 
-    void GenerateTexture(const std::string_view& texturePath);
+    void GenerateTexture(const std::string_view& texturePath, int textureSlot = 0);
 
     void Bind() const;
     void UnBind() const;

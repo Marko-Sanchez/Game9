@@ -26,7 +26,7 @@ void Texture2D::UnBind() const
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Texture2D::GenerateTexture(const std::string_view& texturePath)
+void Texture2D::GenerateTexture(const std::string_view& texturePath, int textureSlot)
 {
     std::error_code ec;
     if (!std::filesystem::exists(texturePath, ec))
@@ -41,7 +41,7 @@ void Texture2D::GenerateTexture(const std::string_view& texturePath)
     if (buffer.get())
     {
         glGenTextures(1, &m_ID);
-        glActiveTexture(GL_TEXTURE0);// TODO: add textureSlot
+        glActiveTexture(GL_TEXTURE0 + textureSlot);
         Bind();
 
         glTexImage2D(GL_TEXTURE_2D, 0, m_internalFormat, m_width, m_height, 0, m_imageFormat, GL_UNSIGNED_BYTE, buffer.get());
