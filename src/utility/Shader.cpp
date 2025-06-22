@@ -4,9 +4,8 @@
 
 #include <climits>
 #include <iostream>
-#include <fstream>
 #include <filesystem>
-#include <ostream>
+#include <fstream>
 #include <string>
 #include <system_error>
 
@@ -17,6 +16,14 @@ m_programID(0)
 Shader::~Shader()
 {
     glDeleteProgram(m_programID);
+}
+
+/*
+ * Returns Shader program ID. If function returns 0, shader has no been created or error occured.
+ */
+unsigned int Shader::GetID() const noexcept
+{
+    return m_programID;
 }
 
 void Shader::Bind() const
@@ -45,14 +52,6 @@ void Shader::LoadShader(const std::string_view& vertexPath, const std::string_vi
  */
 std::string Shader::ParseShaderFile(const std::string_view& filepath)
 {
-    std::error_code ec;
-    if (!std::filesystem::exists(filepath, ec))
-    {
-        std::cerr << "File " << filepath << " does not exits...\n" <<
-            ec.message() << std::endl;
-        return "";
-    }
-
     std::ifstream ifs(filepath.data());
     if (!ifs.is_open())
     {
@@ -63,7 +62,8 @@ std::string Shader::ParseShaderFile(const std::string_view& filepath)
     std::string line;
     std::string contents;
 
-    if (const auto size = std::filesystem::file_size(filepath, ec); !ec)
+    std::error_code ec;
+    if (const auto size{std::filesystem::file_size(filepath, ec)}; !ec)
         contents.reserve(size);
 
     while (getline(ifs, line))

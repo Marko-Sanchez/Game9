@@ -29,6 +29,8 @@ class Shader
     Shader();
     ~Shader();
 
+    unsigned int GetID() const noexcept;
+
     void Bind() const;
     void UnBind() const;
 
