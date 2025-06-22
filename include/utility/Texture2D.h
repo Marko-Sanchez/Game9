@@ -23,10 +23,12 @@ public:
     Texture2D();
     ~Texture2D();
 
-    void GenerateTexture(const std::string_view& texturePath, int textureSlot = 0);
+    unsigned int GetID() const noexcept;
 
     void Bind() const;
     void UnBind() const;
+
+    void GenerateTexture(const std::string_view& texturePath, int textureSlot = 0);
 };
 
 #endif
