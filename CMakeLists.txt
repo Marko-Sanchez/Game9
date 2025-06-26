@@ -1,6 +1,8 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.18)
 
-project(Game9 CXX)
+project(Game9
+    DESCRIPTION "The 9th Game in the series"
+    LANGUAGES CXX)
 
 # Set CPP Standard
 set(CMAKE_CXX_STANDARD 20)
