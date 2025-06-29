@@ -1,58 +1,75 @@
 #include "utility/ResourceManager.h"
-#include "utility/Texture2D.h"
 
 #include <iostream>
 
 #include <filesystem>
 #include <system_error>
 
-Shader ResourceManager::LoadShader(const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view shaderName)
+// Instatiate static variables
+std::map<std::string, Shader, std::less<>> ResourceManager::m_shader;
+std::map<std::string, Texture2D, std::less<>> ResourceManager::m_textures;
+
+std::optional<Shader> ResourceManager::LoadShader(const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view shaderName)
 {
     std::error_code ec;
     if (!std::filesystem::exists(vertexPath, ec) || !std::filesystem::exists(fragmentPath, ec))
     {
         std::cerr << "Shader path not found:\n" << ec.message() << std::endl;
-        return Shader();
+        return {};
     }
-    if (m_shader.find(shaderName.data()) == m_shader.end())
+
+    if (auto iter = m_shader.find(shaderName); iter == m_shader.end())
     {
-        std::cerr << "Shader already exist with this name: " << shaderName << std::endl;
-        return Shader();
+        std::string name{shaderName};
+        m_shader[name] = Shader();
+        m_shader[name].LoadShader(vertexPath, fragmentPath);
+
+        return m_shader[name];
     }
 
-    m_shader[shaderName.data()] = Shader();
-    m_shader[shaderName.data()].LoadShader(vertexPath, fragmentPath);
-
-    return m_shader[shaderName.data()];
+    std::cerr << "Shader already exist with this name: " << shaderName << std::endl;
+    return {};
 }
 
 // TODO: figure out pathing.
-Texture2D ResourceManager::LoadTexture(const std::string_view texturePath, const std::string_view textureName)
+std::optional<Texture2D> ResourceManager::LoadTexture(const std::string_view texturePath, const std::string_view textureName)
 {
     std::error_code ec;
     if (!std::filesystem::exists(texturePath, ec))
     {
-        std::cerr << "Texture file does not exist:\n" << ec.message() << std::endl;
-        return Texture2D();
+        std::cerr << "Texture path not found:\n" << ec.message() << std::endl;
+        return {};
     }
-    if (m_textures.find(textureName.data()) == m_textures.end())
+
+    if (auto iter = m_textures.find(textureName); iter == m_textures.end())
     {
-        std::cerr << "Texture already exist with this name: " << textureName << std::endl;
-        return Texture2D();
+        std::string name{textureName};
+        m_textures[name] = Texture2D();
+        m_textures[name].GenerateTexture(texturePath);
+
+        return m_textures[name];
     }
 
-    m_textures[textureName.data()] = Texture2D();
-    m_textures[textureName.data()].GenerateTexture(texturePath);
-
-    return m_textures[textureName.data()];
+    std::cerr << "Texture already exist with this name: " << textureName << std::endl;
+    return {};
 }
 
-Shader ResourceManager::GetShader(const std::string_view shaderName)
+std::optional<Shader> ResourceManager::GetShader(const std::string_view shaderName)
 {
-    return m_shader[shaderName.data()];
+    if (auto iter = m_shader.find(shaderName); iter != m_shader.end())
+    {
+        return iter->second;
+    }
+
+    return {};
 }
 
-Texture2D ResourceManager::GetTexture(const std::string_view textureName)
+std::optional<Texture2D> ResourceManager::GetTexture(const std::string_view textureName)
 {
-    return m_textures[textureName.data()];
+    if (auto iter = m_textures.find(textureName); iter != m_textures.end())
+    {
+        return iter->second;
+    }
+
+    return {};
 }
