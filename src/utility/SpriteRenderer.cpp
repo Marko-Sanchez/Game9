@@ -26,7 +26,7 @@ void SpriteRenderer::DrawSprite(Texture2D &texture, glm::vec2 position, glm::vec
     model = glm::translate(model, glm::vec3(-0.5f * size.x, -0.5f * size.y, 0.0f));// move origin back
 
     m_shader.SetUniformMat4f("model", model);
-    // TODO: color uniform
+    m_shader.SetUniform3fv("spriteColor", 1, &color.x);
 
     // TODO: Use texture slot from Texture2D.
     glActiveTexture(GL_TEXTURE0);
