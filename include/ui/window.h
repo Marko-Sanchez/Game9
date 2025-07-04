@@ -8,7 +8,7 @@
 namespace Game9
 {
 /*
-* Handles window context, glfw callbacks, and renders the game.
+* Handles window context, and glfw callbacks.
 */
 class Window
 {
@@ -28,7 +28,7 @@ private:
 public:
     Window(std::shared_ptr<GLFWwindow> window, int width, int height);
 
-    void Render(float frameDelta);
+    void Tick(float frameDelta);
 
     int GetWidth() const;
     int GetHeight() const;
