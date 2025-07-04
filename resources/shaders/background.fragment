@@ -1,11 +1,11 @@
 #version 330 core
 
-in vec2 TexCords;
-out vec2 color;
+in vec2 texCords;
+out vec4 color;
 
 uniform sampler2D u_image;
 
 void main()
 {
-    color = texture(image, texCords);
+    color = texture(u_image, texCords);
 }
