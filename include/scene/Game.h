@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include <memory>
+#include "ui/window.h"
 
 enum GameState
 {
@@ -17,12 +18,8 @@ enum GameState
 class Game
 {
 private:
-    int m_width;
-    int m_height;
-
     GameState m_state;
-
-    std::shared_ptr<GLFWwindow> m_window;
+    Game9::Window m_window;
 
 public:
     Game(std::shared_ptr<GLFWwindow> window, int width, int height);
@@ -30,8 +27,8 @@ public:
     // intialize game state (load all shaders/textures).
     void Init();
     // Game loop.
+    void Render();
     void ProcessInput(float deltaTime);
     void Update(float deltaTime);
-    void Render();
 };
 #endif
