@@ -1,4 +1,5 @@
 #include "ui/window.h"
+
 #include <GLFW/glfw3.h>
 
 namespace Game9
@@ -32,6 +33,11 @@ m_height(height)
     });
 }
 
+void Window::Tick(float frameDelta)
+{
+    m_frameDelta = frameDelta;
+}
+
 int Window::GetWidth() const
 {
     return m_width;
@@ -44,25 +50,37 @@ int Window::GetHeight() const
 
 void Window::ProcessWindowSizeCallback(int width, int height)
 {
-
-    // TODO:
+    m_width  = width;
+    m_height = height;
 }
 
 void Window::ProcessKeyboardCallback(int key, int scancode, int action, int mods)
 {
-
-    // TODO:
+    m_camera.ProcessKeyboardInput(key, m_frameDelta);
 }
 
 void Window::ProcessMouseCallback(double xPosIn, double yPosIn)
 {
+    float xpos{static_cast<float>(xPosIn)};
+    float ypos{static_cast<float>(yPosIn)};
 
-    // TODO:
+    if (m_firstMouseMovement)
+    {
+        m_lastMouseX = xpos;
+        m_lastMouseY = ypos;
+        m_firstMouseMovement = false;
+    }
+
+    float xoffset{xpos - m_lastMouseX};
+    float yoffset{m_lastMouseY - ypos};
+
+    m_lastMouseX = xpos;
+    m_lastMouseY = ypos;
+    m_camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void Window::ProcessMouseScrollCallback(double xPosIn, double yPosIn)
 {
-
-    // TODO:
+    m_camera.ProcessMouseScroll(static_cast<float>(yPosIn));
 }
 }// namespace Game9
