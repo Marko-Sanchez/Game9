@@ -8,7 +8,7 @@
 
 /* Constructor */
 Texture2D::Texture2D():
-m_ID(0), m_desiredFormat(GL_RGBA), m_wrapS(GL_CLAMP_TO_EDGE), m_wrapT(GL_CLAMP_TO_EDGE), m_filterMin(GL_LINEAR), m_filterMax(GL_LINEAR)
+m_ID(0), m_imageFormat(GL_RGBA), m_wrapS(GL_CLAMP_TO_EDGE), m_wrapT(GL_CLAMP_TO_EDGE), m_filterMin(GL_LINEAR), m_filterMax(GL_LINEAR)
 {}
 
 /* Destructor */
@@ -53,6 +53,7 @@ void Texture2D::GenerateTexture(const std::string_view& texturePath, int texture
     stbi_set_flip_vertically_on_load(1);
     m_textureSlot = textureSlot;
 
+    // stbi_load will return the number of channels in the image if desired_channels (last value) is 0.
     std::unique_ptr<unsigned char[], decltype(stbi_image_free)*>
     buffer(stbi_load(std::string(texturePath).c_str(), &m_width, &m_height, &m_internalFormat, 0), stbi_image_free);
 
@@ -62,7 +63,7 @@ void Texture2D::GenerateTexture(const std::string_view& texturePath, int texture
         glActiveTexture(GL_TEXTURE0 + textureSlot);
         Bind();
 
-        glTexImage2D(GL_TEXTURE_2D, 0, m_internalFormat, m_width, m_height, 0, m_desiredFormat, GL_UNSIGNED_BYTE, buffer.get());
+        glTexImage2D(GL_TEXTURE_2D, 0, m_internalFormat, m_width, m_height, 0, m_imageFormat, GL_UNSIGNED_BYTE, buffer.get());
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_wrapS);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_wrapT);

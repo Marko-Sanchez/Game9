@@ -16,8 +16,12 @@ public:
     int m_width;
     int m_height;
 
-    int m_internalFormat;// format given by image.
-    int m_desiredFormat;// desired image format output.
+    // Describes how the texture will be stored in the GPU.
+    // stbi_load will return the number of channels in the image
+    // if desired_channels (last value) is 0.
+    int m_internalFormat;
+    // Defines data being passed to GPU.
+    int m_imageFormat;
 
     unsigned int m_wrapS;
     unsigned int m_wrapT;
