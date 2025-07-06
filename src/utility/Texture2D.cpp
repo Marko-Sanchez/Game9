@@ -6,10 +6,12 @@
 #include <iostream>
 #include <memory>
 
+/* Constructor */
 Texture2D::Texture2D():
-m_ID(0), m_internalFormat(GL_RGB), m_wrapS(GL_REPEAT), m_wrapT(GL_REPEAT), m_filterMin(GL_LINEAR), m_filterMax(GL_LINEAR)
+m_ID(0), m_desiredFormat(GL_RGBA), m_wrapS(GL_CLAMP_TO_EDGE), m_wrapT(GL_CLAMP_TO_EDGE), m_filterMin(GL_LINEAR), m_filterMax(GL_LINEAR)
 {}
 
+/* Destructor */
 Texture2D::~Texture2D()
 {
     glDeleteTextures(1, &m_ID);
@@ -21,6 +23,12 @@ Texture2D::~Texture2D()
 unsigned int Texture2D::GetID() const noexcept
 {
     return m_ID;
+}
+
+/* Returns texture slot. */
+int Texture2D::GetTextureSlot() const noexcept
+{
+    return m_textureSlot;
 }
 
 void Texture2D::Bind() const
@@ -35,22 +43,26 @@ void Texture2D::UnBind() const
 
 /*
 * Generates a 2D texture from the given path.
+*
 * @params:
-* {const std::string_view&} texturePath: path to 2D texture.
-* {int} textureSlot: active texture slot that will affect subsequent texture state calls.
+* texturePath: path to 2D texture.
+* textureSlot: active texture slot that will affect subsequent texture state calls.
 */
 void Texture2D::GenerateTexture(const std::string_view& texturePath, int textureSlot)
 {
     stbi_set_flip_vertically_on_load(1);
+    m_textureSlot = textureSlot;
 
-    std::unique_ptr<unsigned char[], decltype(stbi_image_free)*> buffer(stbi_load(std::string(texturePath).c_str(), &m_width, &m_height, &m_imageFormat, 0), stbi_image_free);
+    std::unique_ptr<unsigned char[], decltype(stbi_image_free)*>
+    buffer(stbi_load(std::string(texturePath).c_str(), &m_width, &m_height, &m_internalFormat, 0), stbi_image_free);
+
     if (buffer.get())
     {
         glGenTextures(1, &m_ID);
         glActiveTexture(GL_TEXTURE0 + textureSlot);
         Bind();
 
-        glTexImage2D(GL_TEXTURE_2D, 0, m_internalFormat, m_width, m_height, 0, m_imageFormat, GL_UNSIGNED_BYTE, buffer.get());
+        glTexImage2D(GL_TEXTURE_2D, 0, m_internalFormat, m_width, m_height, 0, m_desiredFormat, GL_UNSIGNED_BYTE, buffer.get());
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_wrapS);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_wrapT);

@@ -3,16 +3,21 @@
 
 #include <string_view>
 
+/*
+* Generates a 2D Texture using third-party vendor STBI to load
+* image data.
+*/
 class Texture2D
 {
 public:
     unsigned int m_ID;
+    int m_textureSlot;
 
     int m_width;
     int m_height;
 
-    int m_internalFormat;// desired image format output.
-    int m_imageFormat;   // format given by image.
+    int m_internalFormat;// format given by image.
+    int m_desiredFormat;// desired image format output.
 
     unsigned int m_wrapS;
     unsigned int m_wrapT;
@@ -24,6 +29,7 @@ public:
     ~Texture2D();
 
     unsigned int GetID() const noexcept;
+    int GetTextureSlot() const noexcept;
 
     void Bind() const;
     void UnBind() const;
