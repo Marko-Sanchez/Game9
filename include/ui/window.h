@@ -34,6 +34,8 @@ public:
     int GetHeight() const;
 
 private:
+    void SetWindowIcon();
+
     // callbacks.
     void ProcessWindowSizeCallback(int width, int height);
     void ProcessKeyboardCallback(int key, int scancode, int action, int mods);
