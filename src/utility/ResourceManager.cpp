@@ -18,7 +18,7 @@ std::optional<ResourceManager::shared_shader> ResourceManager::LoadShader(const 
     if (!std::filesystem::exists(vertexPath, ec) || !std::filesystem::exists(fragmentPath, ec))
     {
         std::cerr << "Shader path not found:\n" << ec.message() << std::endl;
-        return {};
+        return std::nullopt;
     }
 
     if (auto iter = m_shader.find(shaderName); iter == m_shader.end())
@@ -32,7 +32,7 @@ std::optional<ResourceManager::shared_shader> ResourceManager::LoadShader(const 
     }
 
     std::cerr << "Shader already exist with this name: " << shaderName << std::endl;
-    return {};
+    return std::nullopt;
 }
 
 // TODO: figure out pathing.
@@ -56,7 +56,7 @@ std::optional<ResourceManager::shared_texture> ResourceManager::LoadTexture(cons
     }
 
     std::cerr << "Texture already exist with this name: " << textureName << std::endl;
-    return {};
+    return std::nullopt;
 }
 
 std::optional<ResourceManager::shared_shader> ResourceManager::GetShader(const std::string_view shaderName)
@@ -66,7 +66,7 @@ std::optional<ResourceManager::shared_shader> ResourceManager::GetShader(const s
         return iter->second;
     }
 
-    return {};
+    return std::nullopt;
 }
 
 std::optional<ResourceManager::shared_texture> ResourceManager::GetTexture(const std::string_view textureName)
@@ -76,7 +76,7 @@ std::optional<ResourceManager::shared_texture> ResourceManager::GetTexture(const
         return iter->second;
     }
 
-    return {};
+    return std::nullopt;
 }
 
 /*
