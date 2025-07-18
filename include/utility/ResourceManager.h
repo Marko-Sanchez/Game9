@@ -13,8 +13,9 @@
 class ResourceManager
 {
 private:
-    using shared_shader = std::shared_ptr<Shader>;
+    using shared_shader  = std::shared_ptr<Shader>;
     using shared_texture = std::shared_ptr<Texture2D>;
+    using shared_image   = std::shared_ptr<unsigned char>;
 
 public:
     static std::map<std::string, shared_shader, std::less<>> m_shader;
@@ -25,6 +26,8 @@ public:
 
     static std::optional<shared_texture> LoadTexture(const std::string_view texturePath, const std::string_view textureName);
     static std::optional<shared_texture> GetTexture(const std::string_view textureName);
+
+    static std::optional<shared_image> LoadImage(const std::string_view path, int& width, int& height);
 
     // TODO: function to remove un-used textures and shaders.
 private:

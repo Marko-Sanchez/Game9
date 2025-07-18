@@ -1,8 +1,11 @@
 #include "utility/ResourceManager.h"
 
+#include <stb/stb_image.h>
+
 #include <iostream>
 
 #include <filesystem>
+#include <string_view>
 #include <system_error>
 
 // Instatiate static variables
@@ -74,4 +77,25 @@ std::optional<ResourceManager::shared_texture> ResourceManager::GetTexture(const
     }
 
     return {};
+}
+
+/*
+* Loads an rgba image and updates passed the references width and height, Returns an optional
+* containing shared_ptr<unsigned char> with custom deleter 'stbi_image_free.'
+*
+* @params:
+* path: path to image.
+* width: reference to width, will be updated by stbi_load.
+* height: reference to height, will be updated by stbi_load.
+*/
+std::optional<ResourceManager::shared_image> ResourceManager::LoadImage(const std::string_view path, int& width, int& height)
+{
+    std::error_code ec;
+    if (!std::filesystem::exists(path, ec))
+    {
+        std::cerr << "Path not found:\n" << ec.message() << std::endl;
+        return std::nullopt;
+    }
+
+    return std::shared_ptr<unsigned char>(stbi_load(path.data(), &width, &height, 0, 4), stbi_image_free);
 }
