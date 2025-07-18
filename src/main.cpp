@@ -47,7 +47,7 @@ int main()
     auto sharedIcon32 = ResourceManager::LoadImage("resources/images/winIcon32.png", iconImage[1].width, iconImage[1].height);
     auto sharedIcon16 = ResourceManager::LoadImage("resources/images/winIcon16.png", iconImage[2].width, iconImage[2].height);
 
-    if (sharedIcon64 || sharedIcon32 || sharedIcon16)
+    if (sharedIcon64 && sharedIcon32 && sharedIcon16)
     {
         iconImage[0].pixels = sharedIcon64->get();
         iconImage[1].pixels = sharedIcon32->get();
