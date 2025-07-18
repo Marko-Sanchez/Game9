@@ -4,11 +4,11 @@
 #include <GLFW/glfw3.h>
 
 #include <cstdlib>
-#include <filesystem>
 #include <iostream>
 #include <memory>
 
 #include "scene/Game.h"
+#include <utility/ResourceManager.h>
 
 int main()
 {
@@ -32,10 +32,6 @@ int main()
         return EXIT_FAILURE;
     }
 
-    // TODO: setup icon here:?
-    //
-    //
-
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -43,6 +39,25 @@ int main()
     // Make Window Current Context, set swap interval to wait for 1 screen update before swapping buffers.
     glfwMakeContextCurrent(glfw_window.get());
     glfwSwapInterval(1);
+
+    // Note: This sets the icon on the window context, may not show up due to Gnome windowing.
+    GLFWimage iconImage[3];
+
+    auto sharedIcon64 = ResourceManager::LoadImage("resources/images/winIcon64.png", iconImage[0].width, iconImage[0].height);
+    auto sharedIcon32 = ResourceManager::LoadImage("resources/images/winIcon32.png", iconImage[1].width, iconImage[1].height);
+    auto sharedIcon16 = ResourceManager::LoadImage("resources/images/winIcon16.png", iconImage[2].width, iconImage[2].height);
+
+    if (sharedIcon64 || sharedIcon32 || sharedIcon16)
+    {
+        iconImage[0].pixels = sharedIcon64->get();
+        iconImage[1].pixels = sharedIcon32->get();
+        iconImage[2].pixels = sharedIcon16->get();
+        glfwSetWindowIcon(glfw_window.get(), 3, iconImage);
+    }
+    else
+    {
+        std::cerr << "Failed to load one or more icons" << std::endl;
+    }
 
     // OpenGL configuration.
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
