@@ -18,8 +18,8 @@ private:
     using shared_image   = std::shared_ptr<unsigned char>;
 
 public:
-    static std::map<std::string, shared_shader, std::less<>> m_shader;
-    static std::map<std::string, shared_texture, std::less<>> m_textures;
+    inline static std::map<std::string, shared_shader, std::less<>> m_shader;
+    inline static std::map<std::string, shared_texture, std::less<>> m_textures;
 
     static std::optional<shared_shader> LoadShader(const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view shaderName);
     static std::optional<shared_shader> GetShader(const std::string_view shaderName);

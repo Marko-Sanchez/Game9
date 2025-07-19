@@ -8,10 +8,6 @@
 #include <string_view>
 #include <system_error>
 
-// Instatiate static variables
-std::map<std::string, ResourceManager::shared_shader, std::less<>> ResourceManager::m_shader;
-std::map<std::string, ResourceManager::shared_texture, std::less<>> ResourceManager::m_textures;
-
 std::optional<ResourceManager::shared_shader> ResourceManager::LoadShader(const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view shaderName)
 {
     std::error_code ec;
@@ -42,7 +38,7 @@ std::optional<ResourceManager::shared_texture> ResourceManager::LoadTexture(cons
     if (!std::filesystem::exists(texturePath, ec))
     {
         std::cerr << "Texture path not found:\n" << ec.message() << std::endl;
-        return {};
+        return std::nullopt;
     }
 
     if (auto iter = m_textures.find(textureName); iter == m_textures.end())
