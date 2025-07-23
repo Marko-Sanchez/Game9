@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type = Application
+Name = Game9
+# exec stored in /home/user/bin/
+Exec = game9
+# .png (named in cmakelist.txt) is stored in /usr/share/icons/hicolor/64x64
+Icon = appicon-game9
+Categories = Game;
+Terminal = false
+StartupWMClass = GAME9
+Comment = The 9th Game in the series
