@@ -65,7 +65,7 @@ public:
     static std::optional<shared_shader> LoadShader(const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view shaderName);
     static std::optional<shared_shader> GetShader(const std::string_view shaderName);
 
-    static std::optional<shared_texture> LoadTexture(const std::string_view texturePath, const std::string_view textureName);
+    static std::optional<shared_texture> LoadTexture(const std::string_view texturePath, const std::string_view textureName, const int textureSlot);
     static std::optional<shared_texture> GetTexture(const std::string_view textureName);
 
     static std::optional<shared_image> LoadImage(const std::string_view path, int& width, int& height);

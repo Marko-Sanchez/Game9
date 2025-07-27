@@ -57,8 +57,8 @@ std::optional<ResourceManager::shared_shader> ResourceManager::LoadShader(const 
     return m_shader[name];
 }
 
-// TODO: figure out pathing.
-std::optional<ResourceManager::shared_texture> ResourceManager::LoadTexture(const std::string_view texturePath, const std::string_view textureName)
+// TODO: Figure file paths, in the case were user does not call executable from source directory.
+std::optional<ResourceManager::shared_texture> ResourceManager::LoadTexture(const std::string_view texturePath, const std::string_view textureName, const int textureSlot)
 {
     std::error_code ec;
     if (!std::filesystem::exists(texturePath, ec))
@@ -67,18 +67,18 @@ std::optional<ResourceManager::shared_texture> ResourceManager::LoadTexture(cons
         return std::nullopt;
     }
 
-    if (auto iter = m_textures.find(textureName); iter == m_textures.end())
+    if (auto iter = m_textures.find(textureName); iter != m_textures.end())
     {
-        std::string name{textureName};
-        auto texture = std::make_shared<Texture2D>();
-        texture->GenerateTexture(texturePath);
-        m_textures[name] = texture;
-
-        return m_textures[name];
+        std::cerr << "Texture already exist with this name: " << textureName << std::endl;
+        return std::nullopt;
     }
 
-    std::cerr << "Texture already exist with this name: " << textureName << std::endl;
-    return std::nullopt;
+    std::string name{textureName};
+    auto texture = std::make_shared<Texture2D>();
+    texture->GenerateTexture(texturePath, textureSlot);
+    m_textures[name] = texture;
+
+    return m_textures[name];
 }
 
 std::optional<ResourceManager::shared_shader> ResourceManager::GetShader(const std::string_view shaderName)
