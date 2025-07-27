@@ -15,28 +15,31 @@
 // again where there initialized to 0 again.
 class Shader
 {
-    private:
+private:
     // A program (Shader program) is an object that combines multiple shader stages
     // (vertex, fragment, etc) into a single executable that runs on the GPU.
     unsigned int m_programID;
 
-    std::string m_vertexshader;
-    std::string m_fragmentshader;
+    // Compiled shader IDs.
+    unsigned int m_vertexID;
+    unsigned int m_fragmentID;
 
+    // Holds variables from shader file, ex. Sampler2D.
     std::unordered_map<std::string, int> m_uniformLocationCache;
 
-    public:
-    Shader();
+public:
+    Shader(unsigned int vertexID, unsigned int fragmentID);
     ~Shader();
 
     unsigned int GetID() const noexcept;
+    std::pair<unsigned int, unsigned int> GetFileIDs() const noexcept;
 
     void Bind() const;
     void UnBind() const;
 
-    void LoadShader(const std::string_view& vertexPath, const std::string_view& fragmentPath);
-    std::string ParseShaderFile(const std::string_view& filepath);
+    void CreateShader();
 
+private:
     // Set the value of a uniform in current shader.
     void SetUniform1i(const std::string& name, int value);
     void SetUniform1iv(const std::string& name, int count, int* value);
@@ -46,9 +49,5 @@ class Shader
     void SetUniformMat4f(const std::string& name, const glm::mat4& matrix);
 
     int GetUniformLocation(const std::string& name);
-
-    private:
-    void CreateShader();
-    unsigned int CompileShader(unsigned int type, const std::string& source);
 };
 #endif

@@ -1,17 +1,20 @@
 #include "utility/Shader.h"
 
 #include <GL/glew.h>
-
 #include <climits>
 #include <iostream>
-#include <filesystem>
-#include <fstream>
 #include <string>
-#include <system_error>
 
-Shader::Shader():
-m_programID(0)
-{}
+Shader::Shader(unsigned int vertexID, unsigned int fragmentID):
+m_vertexID(vertexID),
+m_fragmentID(fragmentID)
+{
+    // TODO: how to properly handle an error here.
+    if (m_programID = glCreateProgram(); !m_programID)
+    {
+        std::cerr << "Error occured creating program" << std::endl;
+    }
+}
 
 Shader::~Shader()
 {
@@ -26,6 +29,15 @@ unsigned int Shader::GetID() const noexcept
     return m_programID;
 }
 
+/*
+ * Returns pair of shader file IDs.
+ */
+std::pair<unsigned int, unsigned int> Shader::GetFileIDs() const noexcept
+{
+    // Copy Elison: Creation of a class object from source object can be ommited.
+    return {m_vertexID, m_fragmentID};
+}
+
 void Shader::Bind() const
 {
    glUseProgram(m_programID);
@@ -37,57 +49,13 @@ void Shader::UnBind() const
 }
 
 /*
- * Parse shader file, attaches vertex and fragment shader; Links them together.
- */
-void Shader::LoadShader(const std::string_view& vertexPath, const std::string_view& fragmentPath)
-{
-    m_vertexshader = ParseShaderFile(vertexPath);
-    m_fragmentshader = ParseShaderFile(fragmentPath);
-
-    CreateShader();
-}
-
-/*
- * Read contents of file into a std::string variable.
- */
-std::string Shader::ParseShaderFile(const std::string_view& filepath)
-{
-    std::ifstream ifs(filepath.data());
-    if (!ifs.is_open())
-    {
-        std::cerr << "Failed to Open file: " << filepath << std::endl;
-        return "";
-    }
-
-    std::string line;
-    std::string contents;
-
-    std::error_code ec;
-    if (const auto size{std::filesystem::file_size(filepath, ec)}; !ec)
-        contents.reserve(size);
-
-    while (getline(ifs, line))
-    {
-        contents.append(line + '\n');
-    }
-
-    return contents;
-}
-
-/*
- * Attach vertex and fragment to m_programID.
+ * Attach vertex and fragment to m_programID. Shader deletion is handled by
+ * FILEID in ResourceManager class.
  */
 void Shader::CreateShader()
 {
-    m_programID = glCreateProgram();
-    if (m_programID == 0)
-        std::cerr << "Error occured creating program" << std::endl;
-
-    unsigned int vs{CompileShader(GL_VERTEX_SHADER, m_vertexshader)};
-    unsigned int fs{CompileShader(GL_FRAGMENT_SHADER, m_fragmentshader)};
-
-    glAttachShader(m_programID, vs);
-    glAttachShader(m_programID, fs);
+    glAttachShader(m_programID, m_vertexID);
+    glAttachShader(m_programID, m_fragmentID);
     glLinkProgram(m_programID);
     glValidateProgram(m_programID);
 
@@ -97,57 +65,16 @@ void Shader::CreateShader()
     if (linkresult == GL_FALSE || validateresult == GL_FALSE)
     {
         int loglength;
+        std::string message;
+
         glGetProgramiv(m_programID, GL_INFO_LOG_LENGTH, &loglength);
 
-        char *message = (char*) alloca(loglength * sizeof(char));
-        glGetProgramInfoLog(m_programID, loglength, &loglength, message);
+        message.reserve(loglength);
+        glGetShaderInfoLog(m_programID, loglength, &loglength, message.data());
 
         std::cerr << "Program failed to link/validate:\n\n"
                   << message << std::endl;
     }
-
-    glDeleteShader(vs);
-    glDeleteShader(fs);
-}
-
-/*
- * Compiles shader out of raw file contents.
- *
- * @param:
- * unsigned int {type}: type of shader; vertex or fragment.
- * const std::string {source}: file contents.
- */
-unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
-{
-    unsigned int id{glCreateShader(type)};
-    const char* src = source.c_str();
-    glShaderSource(id, 1, &src, nullptr);
-    glCompileShader(id);
-
-    // check if shader compiled successfully, else print log error.
-    int result{};
-    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-    if (result == GL_FALSE)
-    {
-        int length;
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-
-        char *message = (char*)alloca(length * sizeof(char));
-        glGetShaderInfoLog(id, length, &length, message);
-
-        /* std::string message; */
-        /* message.reserve(length); */
-        /* glGetShaderInfoLog(id, length, &length, message.data()); */
-
-        std::cerr << "Failed to Compile "
-            << (type == GL_VERTEX_SHADER ? "vertex" : "fragment")
-            << " shader\n" << message << std::endl;
-
-        glDeleteShader(id);
-        return 0;
-    }
-
-    return id;
 }
 
 // looks up uniform in cache, if not found does a expensive glGetUniformLocation() look up.
