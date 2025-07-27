@@ -39,7 +39,6 @@ public:
 
     void CreateShader();
 
-private:
     // Set the value of a uniform in current shader.
     void SetUniform1i(const std::string& name, int value);
     void SetUniform1iv(const std::string& name, int count, int* value);
