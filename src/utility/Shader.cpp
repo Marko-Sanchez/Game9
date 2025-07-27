@@ -50,7 +50,7 @@ void Shader::UnBind() const
 
 /*
  * Attach vertex and fragment to m_programID. Shader deletion is handled by
- * FILEID in ResourceManager class.
+ * ShaderFileHandler in ResourceManager class.
  */
 void Shader::CreateShader()
 {
