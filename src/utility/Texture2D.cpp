@@ -50,8 +50,9 @@ void Texture2D::UnBind() const
 */
 void Texture2D::GenerateTexture(const std::string_view& texturePath, int textureSlot)
 {
-    stbi_set_flip_vertically_on_load(1);
     m_textureSlot = textureSlot;
+
+    stbi_set_flip_vertically_on_load(1);
 
     // stbi_load will return the number of channels in the image if desired_channels (last value) is 0.
     std::unique_ptr<unsigned char[], decltype(stbi_image_free)*>
