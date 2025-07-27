@@ -1,13 +1,19 @@
 #include "utility/ResourceManager.h"
 
+
 #include <stb/stb_image.h>
 
 #include <iostream>
 
+#include <fstream>
 #include <filesystem>
 #include <string_view>
 #include <system_error>
 
+/*
+ * Parses and compiles vertex and fragment shader files. If shader path already exist,
+ * create a new shader and attach the already created shader id to a new program.
+*/
 std::optional<ResourceManager::shared_shader> ResourceManager::LoadShader(const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view shaderName)
 {
     std::error_code ec;
@@ -16,19 +22,39 @@ std::optional<ResourceManager::shared_shader> ResourceManager::LoadShader(const 
         std::cerr << "Shader path not found:\n" << ec.message() << std::endl;
         return std::nullopt;
     }
-
-    if (auto iter = m_shader.find(shaderName); iter == m_shader.end())
+    else if (auto shaderIter = m_shader.find(shaderName); shaderIter != m_shader.end())
     {
-        std::string name{shaderName};
-        auto shader = std::make_shared<Shader>();
-        shader->LoadShader(vertexPath, fragmentPath);
-        m_shader[name] = shader;
-
-        return m_shader[name];
+        std::cerr << "Shader already exist with this name: " << shaderName << std::endl;
+        return std::nullopt;
     }
 
-    std::cerr << "Shader already exist with this name: " << shaderName << std::endl;
-    return std::nullopt;
+    auto vertexIter = m_files.find(vertexPath);
+    auto fragmentIter = m_files.find(fragmentPath);
+
+    if (vertexIter ==  m_files.end())
+    {
+        std::string contents{ParseShaderFile(vertexPath)};
+        m_files.emplace(vertexPath, CompileShader(GL_VERTEX_SHADER, contents));
+        vertexIter = m_files.find(vertexPath);
+    }
+    if (fragmentIter == m_files.end())
+    {
+        std::string contents{ParseShaderFile(fragmentPath)};
+        m_files.emplace(fragmentPath, CompileShader(GL_FRAGMENT_SHADER, contents));
+        fragmentIter = m_files.find(fragmentPath);
+    }
+
+    auto vID = vertexIter->second.ID;
+    auto fID = fragmentIter->second.ID;
+
+    // Create Shader.
+    auto shader = std::make_shared<Shader>(vID, fID);
+    shader->CreateShader();
+
+    std::string name{shaderName};
+    m_shader.emplace(name, shader);
+
+    return m_shader[name];
 }
 
 // TODO: figure out pathing.
@@ -94,4 +120,69 @@ std::optional<ResourceManager::shared_image> ResourceManager::LoadImage(const st
     }
 
     return std::shared_ptr<unsigned char>(stbi_load(path.data(), &width, &height, 0, 4), stbi_image_free);
+}
+
+/*
+* Reads contents from file and returns as a string.
+*/
+std::string ResourceManager::ParseShaderFile(const std::string_view& filepath)
+{
+    std::ifstream ifs(filepath.data());
+    if (!ifs.is_open())
+    {
+        std::cerr << "Failed to Open file: " << filepath << std::endl;
+        return "";
+    }
+
+    std::string line;
+    std::string contents;
+
+    std::error_code ec;
+    if (const auto size{std::filesystem::file_size(filepath, ec)}; !ec)
+        contents.reserve(size);
+
+    while (getline(ifs, line))
+    {
+        contents.append(line + '\n');
+    }
+
+    return contents;
+}
+
+/*
+ * Sets the shader source code to an ID: glShaderSource(),
+ * then compiles the source code: glCompileShader().
+ *
+ * @param:
+ * unsigned int {type}: type of shader; vertex or fragment.
+ * const std::string {source}: file contents.
+ */
+unsigned int ResourceManager::CompileShader(unsigned int type, const std::string& source)
+{
+    unsigned int id{glCreateShader(type)};
+    const char* src = source.c_str();
+    glShaderSource(id, 1, &src, nullptr);
+    glCompileShader(id);
+
+    // check if shader compiled successfully, else print log error.
+    int result{};
+    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+    if (result == GL_FALSE)
+    {
+        int length;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+
+        std::string message;
+        message.reserve(length);
+        glGetShaderInfoLog(id, length, &length, message.data());
+
+        std::cerr << "Failed to Compile "
+            << (type == GL_VERTEX_SHADER ? "vertex" : "fragment")
+            << " shader\n" << message << std::endl;
+
+        glDeleteShader(id);
+        return 0;
+    }
+
+    return id;
 }
