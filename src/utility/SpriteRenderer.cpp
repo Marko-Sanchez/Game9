@@ -48,8 +48,7 @@ void SpriteRenderer::DrawSprite(std::shared_ptr<Texture2D> texture, glm::vec2 po
 
     m_shader->SetUniformMat4f("u_model", model);
 
-    // TODO: Use texture slot from Texture2D.
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE0 + texture->GetTextureSlot());
     texture->Bind();
 
     glBindVertexArray(m_vao);
