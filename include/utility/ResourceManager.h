@@ -57,7 +57,7 @@ private:
 
 public:
     // std::string_view file path, ShaderFileHandler is from compileshader.
-    inline static std::map<std::string_view, ShaderFileHandler, std::less<>> m_files;
+    inline static std::map<std::string, ShaderFileHandler, std::less<>> m_files;
 
     inline static std::map<std::string, shared_shader, std::less<>> m_shader;
     inline static std::map<std::string, shared_texture, std::less<>> m_textures;

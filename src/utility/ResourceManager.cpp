@@ -28,20 +28,18 @@ std::optional<ResourceManager::shared_shader> ResourceManager::LoadShader(const 
         return std::nullopt;
     }
 
-    auto vertexIter = m_files.find(vertexPath);
+    auto vertexIter   = m_files.find(vertexPath);
     auto fragmentIter = m_files.find(fragmentPath);
 
     if (vertexIter ==  m_files.end())
     {
         std::string contents{ParseShaderFile(vertexPath)};
-        m_files.emplace(vertexPath, CompileShader(GL_VERTEX_SHADER, contents));
-        vertexIter = m_files.find(vertexPath);
+        vertexIter = m_files.emplace(vertexPath, CompileShader(GL_VERTEX_SHADER, contents)).first;
     }
     if (fragmentIter == m_files.end())
     {
         std::string contents{ParseShaderFile(fragmentPath)};
-        m_files.emplace(fragmentPath, CompileShader(GL_FRAGMENT_SHADER, contents));
-        fragmentIter = m_files.find(fragmentPath);
+        fragmentIter = m_files.emplace(fragmentPath, CompileShader(GL_FRAGMENT_SHADER, contents)).first;
     }
 
     auto vID = vertexIter->second.ID;
