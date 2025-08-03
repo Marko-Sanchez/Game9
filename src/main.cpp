@@ -88,10 +88,10 @@ int main()
         glfwPollEvents();
 
         // manage user input.
-        game9.ProcessInput(deltaTime);
+        /* game9.ProcessInput(deltaTime); */
 
         // TODO: update game state.
-        // game9.Update();
+        game9.Update(deltaTime);
 
         // Render.
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
