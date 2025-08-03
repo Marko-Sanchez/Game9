@@ -1,6 +1,8 @@
 #ifndef TRAIN_H
 #define TRAIN_H
 
+#include <memory>
+
 #include "utility/SpriteRenderer.h"
 #include "utility/Texture2D.h"
 #include <glm/glm.hpp>
@@ -11,18 +13,32 @@ namespace Game9
 class Train
 {
 private:
+    // Train Texture.
+    std::shared_ptr<Texture2D> m_sprite;
+
+    // Train Model data.
     glm::vec2 m_position;
     glm::vec2 m_size;
     glm::vec2 m_velocity;
 
     float m_rotation;
 
-    Texture2D m_sprite;
+    // Current index along path, and progress to next index.
+    float m_segmentProgess;
+    size_t m_currentSegment;
+
+    // Train path to follow using linear interpolation.
+    std::vector<glm::vec2> m_path;
+
 public:
     Train();
-    Train(Texture2D texture, glm::vec2 pos, glm::vec2 size, glm::vec2 velocity);
+    Train(std::shared_ptr<Texture2D> texture, glm::vec2 pos, glm::vec2 size, glm::vec2 velocity);
+    virtual ~Train();
 
-    virtual void Draw(SpriteRenderer &renderer);
+    virtual void Draw(SpriteRenderer *renderer);
+    virtual void Move(float deltaTime);
+
+    virtual void SetPath(const std::vector<glm::vec2>& path);
 };
-}
+}// namespace Game9
 #endif
