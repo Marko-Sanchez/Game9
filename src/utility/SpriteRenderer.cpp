@@ -47,6 +47,7 @@ void SpriteRenderer::DrawSprite(std::shared_ptr<Texture2D> texture, glm::vec2 po
     model = glm::scale(model, glm::vec3(size, 1.0f));
 
     m_shader->SetUniformMat4f("u_model", model);
+    m_shader->SetUniform1i("u_image", texture->GetTextureSlot());
 
     glActiveTexture(GL_TEXTURE0 + texture->GetTextureSlot());
     texture->Bind();
