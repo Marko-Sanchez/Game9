@@ -44,7 +44,7 @@ public:
     virtual ~Train();
 
     virtual void Draw(SpriteRenderer *renderer);
-    virtual void Move(float deltaTime);
+    virtual void Travel(float deltaTime);
 
     virtual void SetPath(const std::vector<glm::vec2>& path);
 };

@@ -15,7 +15,9 @@ m_direction(Direction::FORWARD), m_sprite(texture), m_position(pos), m_size(size
 Train::~Train()
 {}
 
-// Draws sprite using shader in SpriteRenderer object.
+/*
+ * Draws sprite using shader in SpriteRenderer object.
+ */
 void Train::Draw(SpriteRenderer* renderer)
 {
     renderer->DrawSprite(m_sprite, m_position, m_size, m_rotation);
@@ -24,13 +26,8 @@ void Train::Draw(SpriteRenderer* renderer)
 /*
 * Moves the train along a defined path; once either ends are reached, changes direction.
 */
-void Train::Move(float deltaTime)
+void Train::Travel(float deltaTime)
 {
-    if (m_path.size() < 2)
-    {
-        return;
-    }
-
     // Interpolation variable 't'.
     const auto& pointA{m_path[m_currentSegment]};
     const auto& pointB{m_path[m_currentSegment + static_cast<int>(m_direction)]};
@@ -65,9 +62,13 @@ void Train::Move(float deltaTime)
     m_position = glm::mix(currPoint, nextPoint, m_segmentProgess);
 }
 
-// Set points to which train should travel to.
+/*
+* Set points to which train should travel to.
+*/
 void Train::SetPath(const std::vector<glm::vec2>& path)
 {
+    if (path.size() < 2) return;
+
     m_path = path;
 }
 }// namespace Game9
