@@ -13,6 +13,14 @@ namespace Game9
 class Train
 {
 private:
+    enum class Direction: int
+    {
+        FORWARD = 1,
+        REVERSE = -1
+    };
+
+    enum Direction m_direction;
+
     // Train Texture.
     std::shared_ptr<Texture2D> m_sprite;
 
@@ -25,7 +33,7 @@ private:
 
     // Current index along path, and progress to next index.
     float m_segmentProgess;
-    size_t m_currentSegment;
+    int m_currentSegment;
 
     // Train path to follow using linear interpolation.
     std::vector<glm::vec2> m_path;
