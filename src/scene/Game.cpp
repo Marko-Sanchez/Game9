@@ -50,11 +50,15 @@ void Game::Init()
 
     // Load Textures.
     ResourceManager::LoadTexture("resources/images/background.png", "background", 0);
-    ResourceManager::LoadTexture("resources/images/train.png", "train", 1);
+    ResourceManager::LoadTexture("resources/images/trains/GreyTrain.png", "greytrain", 1);
+    ResourceManager::LoadTexture("resources/images/trains/RedTrain.png", "redtrain", 2);
 
     // Temp: in the future setting path may require to be copied from a file, and other way of adding trains to data structure.
-    m_trains.emplace_back(ResourceManager::GetTexture("train").value(), glm::vec2(m_window.GetWidth() / 2, m_window.GetHeight() /2), glm::vec2(64, 64), glm::vec2(50.0f, 50.0f));
+    m_trains.emplace_back(ResourceManager::GetTexture("greytrain").value(), glm::vec2(m_window.GetWidth() / 2, m_window.GetHeight() /2), glm::vec2(64, 64), glm::vec2(50.0f, 50.0f));
     m_trains.back().SetPath({glm::vec2(m_window.GetWidth() / 2, m_window.GetHeight() /2), glm::vec2{m_window.GetWidth(), m_window.GetHeight()}, glm::vec2{0,0}});
+
+    m_trains.emplace_back(ResourceManager::GetTexture("redtrain").value(), glm::vec2(m_window.GetWidth() / 2, m_window.GetHeight() /2), glm::vec2(64, 64), glm::vec2(50.0f, 50.0f));
+    m_trains.back().SetPath({glm::vec2(m_window.GetWidth() / 2, m_window.GetHeight() /2), glm::vec2{m_window.GetWidth() / 2, m_window.GetHeight()}, glm::vec2{0,0}});
 }
 
 void Game::Render()
@@ -73,7 +77,7 @@ void Game::Update(float deltaTime)
     {
         for(auto& train: m_trains)
         {
-            train.Move(deltaTime);
+            train.Travel(deltaTime);
         }
     }
 }
