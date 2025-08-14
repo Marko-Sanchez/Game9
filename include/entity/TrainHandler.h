@@ -3,6 +3,9 @@
 
 #include <glm/glm.hpp>
 
+#include "entity/Train.h"
+#include "utility/ResourceManager.h"
+
 #include <array>
 #include <vector>
 #include <memory>
@@ -31,6 +34,9 @@ private:
 
     /* Maps train names to its type.*/
     std::unordered_map<std::string, TrainTypes> m_trainIdentifier;
+
+    /* Trains.*/
+    std::vector<Train> m_trains;
 public:
     TrainHandler();
     ~TrainHandler();
