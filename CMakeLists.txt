@@ -25,6 +25,9 @@ endif()
 add_library(glm INTERFACE)
 target_include_directories(glm INTERFACE ${CMAKE_SOURCE_DIR}/vendors/glm)
 
+add_library(nlohmann_json INTERFACE)
+target_include_directories(nlohmann_json INTERFACE ${CMAKE_SOURCE_DIR}/vendors/json/include)
+
 target_include_directories(game9 PRIVATE ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/vendors)
 
 target_link_libraries(game9
@@ -34,6 +37,7 @@ target_link_libraries(game9
     X11
     GLU
     glm
+    nlohmann_json
 )
 
 # steps:
