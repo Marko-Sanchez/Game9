@@ -2,9 +2,11 @@
 #define TRAIN_HANDLER_H
 
 #include <glm/glm.hpp>
+#include <glm/fwd.hpp>
 
 #include "entity/Train.h"
 #include "utility/ResourceManager.h"
+#include "utility/SpriteRenderer.h"
 
 #include <array>
 #include <vector>
@@ -41,14 +43,10 @@ public:
     TrainHandler();
     ~TrainHandler();
 
-    void Draw();
-    void LoadPaths();
-    void AddPath();
-    /*
-    * AddPaths()? reads from file iostream >> '{1280, 1280}, {...}'
-    * -- file --
-    * train-type {...}
-    */
+    void Draw(std::shared_ptr<SpriteRenderer> rend);
+    void Update(float deltaTime);
+    void LoadPaths(const std::string_view path);
+    void AddPath(const std::vector<glm::vec2> path);
 };
 }// namespace Game9
 #endif
