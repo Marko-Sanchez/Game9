@@ -18,9 +18,9 @@ Train::~Train()
 /*
  * Draws sprite using shader in SpriteRenderer object.
  */
-void Train::Draw(SpriteRenderer* renderer)
+void Train::Draw(std::shared_ptr<SpriteRenderer> rend)
 {
-    renderer->DrawSprite(m_sprite, m_position, m_size, m_rotation);
+    rend->DrawSprite(m_sprite, m_position, m_size, m_rotation);
 }
 
 /*
