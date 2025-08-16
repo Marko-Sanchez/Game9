@@ -7,13 +7,9 @@
 
 #include "utility/ResourceManager.h"
 
-// Issue uses the same shader for background and train but still works.
-// Multiple SpriteRenderers for different things like background and entitys ?
-std::unique_ptr<SpriteRenderer> sceneRenderer;
-std::shared_ptr<SpriteRenderer> entityRenderer;
 
 Game::Game(std::shared_ptr<GLFWwindow> window, int width, int height):
-m_state(GAME_ACTIVE),
+m_state(GameState::GAME_ACTIVE),
 m_window(window, width, height)
 {}
 
@@ -44,41 +40,30 @@ void Game::Init()
     ResourceManager::GetShader("train").value()->SetUniform1i("u_image", 1);
     ResourceManager::GetShader("train").value()->SetUniformMat4f("u_projection", projection);
 
+    m_trainHandler = std::make_unique<Game9::TrainHandler>();
+
     // TODO: temp for testing. (static-renderer, etc.)
     sceneRenderer = std::make_unique<SpriteRenderer>(ResourceManager::GetShader("background").value());
     entityRenderer = std::make_unique<SpriteRenderer>(ResourceManager::GetShader("train").value());
 
     // Load Textures.
     ResourceManager::LoadTexture("resources/images/background.png", "background", 0);
-    ResourceManager::LoadTexture("resources/images/trains/GreyTrain.png", "greytrain", 1);
-    ResourceManager::LoadTexture("resources/images/trains/RedTrain.png", "redtrain", 2);
 
-    // Temp: in the future setting path may require to be copied from a file, and other way of adding trains to data structure.
-    m_trains.emplace_back(ResourceManager::GetTexture("greytrain").value(), glm::vec2(m_window.GetWidth() / 2, m_window.GetHeight() /2), glm::vec2(64, 64), glm::vec2(50.0f, 50.0f));
-    m_trains.back().SetPath({glm::vec2(m_window.GetWidth() / 2, m_window.GetHeight() /2), glm::vec2{m_window.GetWidth(), m_window.GetHeight()}, glm::vec2{0,0}});
-
-    m_trains.emplace_back(ResourceManager::GetTexture("redtrain").value(), glm::vec2(m_window.GetWidth() / 2, m_window.GetHeight() /2), glm::vec2(64, 64), glm::vec2(50.0f, 50.0f));
-    m_trains.back().SetPath({glm::vec2(m_window.GetWidth() / 2, m_window.GetHeight() /2), glm::vec2{m_window.GetWidth() / 2, m_window.GetHeight()}, glm::vec2{0,0}});
+    // TODO: Testing, hard coded paths.
+    m_trainHandler->LoadPaths("placeholder value for testing");
 }
 
 void Game::Render()
 {
     sceneRenderer->DrawSprite(ResourceManager::GetTexture("background").value(), glm::vec2(0.0f, 0.0f), glm::vec2(static_cast<float>(m_window.GetWidth()), static_cast<float>(m_window.GetHeight())));
-
-    for (auto& train: m_trains)
-    {
-        train.Draw(entityRenderer.get());
-    }
+    m_trainHandler->Draw(entityRenderer);
 }
 
 void Game::Update(float deltaTime)
 {
-    if (m_state == GAME_ACTIVE)
+    if (m_state == GameState::GAME_ACTIVE)
     {
-        for(auto& train: m_trains)
-        {
-            train.Travel(deltaTime);
-        }
+        m_trainHandler->Update(deltaTime);
     }
 }
 
