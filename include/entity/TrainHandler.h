@@ -1,6 +1,7 @@
 #ifndef TRAIN_HANDLER_H
 #define TRAIN_HANDLER_H
 
+#include <fstream>
 #include <glm/glm.hpp>
 #include <glm/fwd.hpp>
 
@@ -50,8 +51,12 @@ private:
     /* Maps train names to its type.*/
     std::unordered_map<std::string_view, TrainTypes> m_trainIdentifier;
 
-    /* Trains.*/
-    std::vector<Train> m_trains;
+    /* Train line and train objects.*/
+    std::unordered_map<std::string, Train> m_trains;
+
+    /* Data loaded from json file containing train data.*/
+    nlohmann::json jsonData;
+
 public:
     TrainHandler();
     ~TrainHandler();
@@ -59,7 +64,7 @@ public:
     void Draw(std::shared_ptr<SpriteRenderer> rend);
     void Update(float deltaTime);
     void LoadPaths(const std::string_view path);
-    void AddTrain(std::string_view name, std::string_view trainName, const std::vector<glm::vec2>& path);
+    void AddTrain(const std::string& name, std::string_view trainName, const std::vector<glm::vec2>& path);
     void ExtendService(std::string_view trainName, const std::vector<glm::vec2>& path);
 };
 }// namespace Game9
