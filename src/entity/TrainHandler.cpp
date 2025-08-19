@@ -78,8 +78,8 @@ TrainHandler::TrainHandler()
 /* Destructor.*/
 TrainHandler::~TrainHandler()
 {
-    // Note: if json data is empty it will write "null"
-    std::ofstream("resources/gamedata/traindata.json", std::ios::trunc) << std::setw(4) << jsonData;
+    if (!jsonData.is_null())
+        std::ofstream("resources/gamedata/traindata.json", std::ios::trunc) << std::setw(4) << jsonData;
 }
 
 /*
@@ -114,28 +114,10 @@ void TrainHandler::Update(float deltaTime)
 */
 void TrainHandler::LoadPaths(const std::string_view filePath)
 {
-    // TODO: For testing purposes, hard-coding the path.
+    // TODO: For testing purposes.
     // Current Window height and width.
     constexpr int WINDOW_WIDTH{1024};
     constexpr int WINDOW_HEIGHT{1024};
-
-    const std::vector<glm::vec2> t1 =
-    {{WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, {WINDOW_WIDTH, WINDOW_HEIGHT}, {0, 0}};
-
-    const std::vector<glm::vec2> t2 =
-    {{WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, {WINDOW_WIDTH/2, WINDOW_HEIGHT}, {0, 0}};
-
-    // Add the actual trains.
-    m_trains.try_emplace("train1", ResourceManager::GetTexture("greytrain").value()/*train name*/, glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), glm::vec2(64, 64), glm::vec2(50, 50));
-    m_trains.try_emplace("train2", ResourceManager::GetTexture("redtrain").value(), glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), glm::vec2(64, 64), glm::vec2(50, 50));
-
-    // Set path
-    m_trains["train1"].SetPath(t1);
-    m_trains["train2"].SetPath(t2);
-
-    // testing.
-    /* AddTrain("name1", "redtrain", t1); */
-    /* AddTrain("name2", "greytrain", t2); */
 
     std::ifstream jsonFile("resources/gamedata/traindata.json");
     if (!jsonFile.is_open())
@@ -144,20 +126,28 @@ void TrainHandler::LoadPaths(const std::string_view filePath)
         return;
     }
 
-    // TODO: If json object is empty init as a nlohmann::json::array()
-    // this may happen on the first time opening the game.
     jsonData = nlohmann::json::parse(jsonFile);
-    if (jsonData.is_discarded())
+    if (jsonData.is_discarded() || jsonData.is_null())
     {
-        return;
+        jsonData["trains"] = nlohmann::json::array();
     }
-
-    for (const auto& train: jsonData["trains"])
+    else
     {
-        std::cout << "-----------ITEM----------------" << std::endl;
-        std::cout << std::setw(4) << train << std::endl;
-    }
+        for (const auto& train: jsonData["trains"])
+        {
+            std::cout << "-----------ITEM----------------" << std::endl;
+            std::cout << std::setw(4) << train << std::endl;
 
+            std::vector<glm::vec2> path;
+            for (const auto& pairs: train["path"].template get<std::vector<std::pair<float, float>>>())
+                path.emplace_back(pairs.first, pairs.second);
+
+            // TODO: getting values for model: initial position, size, and velocity.
+            m_trains.try_emplace(train["name"], ResourceManager::GetTexture(train["trainName"].template get<std::string>()).value(), glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), glm::vec2(64, 64), glm::vec2(50, 50));
+            m_trains[train["name"]].SetPath(path);
+        }
+
+    }
     jsonFile.close();
 }
 
