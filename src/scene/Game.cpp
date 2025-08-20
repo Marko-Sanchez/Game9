@@ -49,8 +49,7 @@ void Game::Init()
     // Load Textures.
     ResourceManager::LoadTexture("resources/images/background.png", "background", 0);
 
-    // TODO: Testing, hard coded paths.
-    m_trainHandler->LoadPaths("placeholder value for testing");
+    m_trainHandler->LoadPaths();
 }
 
 void Game::Render()
