@@ -101,12 +101,7 @@ void TrainHandler::Update(float deltaTime)
 }
 
 /*
-* Load path of trains from file. File is organized as such:
-*
-* <name?> <train-type> <path>:{x_1,y_1} {x_2, y_2} {x_3, y_3}
-* name: is an arbritary name provided by the user.
-* train-type: train type represented in all lower-case from the enum class TrainTypes.
-* path: pairs of floats representing the x and y cordinates that the train will travel between.
+* Loads train data: object name, train name, train type, and path.
 */
 void TrainHandler::LoadPaths()
 {
@@ -122,14 +117,13 @@ void TrainHandler::LoadPaths()
         std::cout << std::setw(4) << train << std::endl;
 
         std::vector<glm::vec2> path = train["path"];
-        std::string objectName = train["name"];
-        std::string trainName  = train["trainName"];
+        std::string objectName = train["name"].template get<std::string>();
+        std::string trainName  = train["trainName"].template get<std::string>();
 
         // TODO: getting values for model: initial position, size, and velocity.
         m_trains.try_emplace(objectName, ResourceManager::GetTexture(trainName).value(), glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), glm::vec2(64, 64), glm::vec2(50, 50));
         m_trains[objectName].SetPath(path);
     }
-
 }
 
 /*
@@ -138,8 +132,10 @@ void TrainHandler::LoadPaths()
 */
 void TrainHandler::AddTrain(const std::string& name, std::string_view trainName, const std::vector<glm::vec2>& path)
 {
-    // name already exist, must be unique.
-    if (m_trains.find(name) != m_trains.end())
+    constexpr int WINDOW_WIDTH{1024};
+    constexpr int WINDOW_HEIGHT{1024};
+
+    if (m_trains.find(name) != m_trains.end() || m_trainIdentifier.find(trainName) == m_trainIdentifier.end())
     {
         return;
     }
@@ -155,6 +151,6 @@ void TrainHandler::AddTrain(const std::string& name, std::string_view trainName,
     m_jsonHandler.m_jsonData["trains"].emplace_back(train);
     std::cout << std::setw(4) << m_jsonHandler.m_jsonData << std::endl;
 
-    //m_trains.try_emplace(name, ResourceManager::GetTexture(trainName).value(),/* position, size, velocity*/);
+    m_trains.try_emplace(name, ResourceManager::GetTexture(trainName).value(), glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), glm::vec2(64, 64), glm::vec2(50, 50));
 }
 }// namespace Game9
