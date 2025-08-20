@@ -1,10 +1,8 @@
 #include "entity/TrainHandler.h"
 #include <iostream>
-#include <fstream>
 
 namespace Game9
 {
-
 // File-private helpers: parse filenames and map train types.
 namespace
 {
@@ -54,7 +52,8 @@ constexpr std::pair<std::string_view, std::string_view> parsefilename(std::strin
 } // unnamed namespace
 
 /* Constructor.*/
-TrainHandler::TrainHandler()
+TrainHandler::TrainHandler():
+m_jsonHandler("resources/gamedata/traindata.json")
 {
     m_texturePaths =
     {
@@ -77,10 +76,7 @@ TrainHandler::TrainHandler()
 
 /* Destructor.*/
 TrainHandler::~TrainHandler()
-{
-    if (!jsonData.is_null())
-        std::ofstream("resources/gamedata/traindata.json", std::ios::trunc) << std::setw(4) << jsonData;
-}
+{}
 
 /*
  * Iterates m_trains and calls draw function of train class object.
@@ -112,43 +108,28 @@ void TrainHandler::Update(float deltaTime)
 * train-type: train type represented in all lower-case from the enum class TrainTypes.
 * path: pairs of floats representing the x and y cordinates that the train will travel between.
 */
-void TrainHandler::LoadPaths(const std::string_view filePath)
+void TrainHandler::LoadPaths()
 {
     // TODO: For testing purposes.
-    // Current Window height and width.
     constexpr int WINDOW_WIDTH{1024};
     constexpr int WINDOW_HEIGHT{1024};
 
-    std::ifstream jsonFile("resources/gamedata/traindata.json");
-    if (!jsonFile.is_open())
+    // Read file and load json data to member variable.
+    m_jsonHandler.Read();
+    for (const auto& train: m_jsonHandler.m_jsonData["trains"])
     {
-        std::cerr << "Failed to open file: traindata.json" << std::endl;
-        return;
+        std::cout << "-----------ITEM----------------" << std::endl;
+        std::cout << std::setw(4) << train << std::endl;
+
+        std::vector<glm::vec2> path = train["path"];
+        std::string objectName = train["name"];
+        std::string trainName  = train["trainName"];
+
+        // TODO: getting values for model: initial position, size, and velocity.
+        m_trains.try_emplace(objectName, ResourceManager::GetTexture(trainName).value(), glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), glm::vec2(64, 64), glm::vec2(50, 50));
+        m_trains[objectName].SetPath(path);
     }
 
-    jsonData = nlohmann::json::parse(jsonFile);
-    if (jsonData.is_discarded() || jsonData.is_null())
-    {
-        jsonData["trains"] = nlohmann::json::array();
-    }
-    else
-    {
-        for (const auto& train: jsonData["trains"])
-        {
-            std::cout << "-----------ITEM----------------" << std::endl;
-            std::cout << std::setw(4) << train << std::endl;
-
-            std::vector<glm::vec2> path;
-            for (const auto& pairs: train["path"].template get<std::vector<std::pair<float, float>>>())
-                path.emplace_back(pairs.first, pairs.second);
-
-            // TODO: getting values for model: initial position, size, and velocity.
-            m_trains.try_emplace(train["name"], ResourceManager::GetTexture(train["trainName"].template get<std::string>()).value(), glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), glm::vec2(64, 64), glm::vec2(50, 50));
-            m_trains[train["name"]].SetPath(path);
-        }
-
-    }
-    jsonFile.close();
 }
 
 /*
@@ -163,28 +144,17 @@ void TrainHandler::AddTrain(const std::string& name, std::string_view trainName,
         return;
     }
 
-    // TODO:
-    // opening and closing files takes a bit, multithread ?
-    // easier way to add array of pairs ?
-    // Use Load Paths().
     nlohmann::json train =
     {
         {"name", name},
         {"trainName", trainName},
-        {"trainType", m_trainIdentifier[trainName]}
+        {"trainType", m_trainIdentifier[trainName]},
+        {"path", path}
     };
 
-    nlohmann::json arr = nlohmann::json::array();
-    for (const auto& coordinates: path)
-    {
-        arr += {coordinates.x, coordinates.y};
-    }
-
-    train["path"] = arr;
-    jsonData["trains"] += train;
-    std::cout << std::setw(4) << jsonData << std::endl;
+    m_jsonHandler.m_jsonData["trains"].emplace_back(train);
+    std::cout << std::setw(4) << m_jsonHandler.m_jsonData << std::endl;
 
     //m_trains.try_emplace(name, ResourceManager::GetTexture(trainName).value(),/* position, size, velocity*/);
 }
-
 }// namespace Game9

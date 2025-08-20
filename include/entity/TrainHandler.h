@@ -1,7 +1,6 @@
 #ifndef TRAIN_HANDLER_H
 #define TRAIN_HANDLER_H
 
-#include <fstream>
 #include <glm/glm.hpp>
 #include <glm/fwd.hpp>
 
@@ -10,6 +9,7 @@
 #include "entity/Train.h"
 #include "utility/ResourceManager.h"
 #include "utility/SpriteRenderer.h"
+#include "utility/JsonFileHandler.h"
 
 #include <array>
 #include <vector>
@@ -55,7 +55,7 @@ private:
     std::unordered_map<std::string, Train> m_trains;
 
     /* Data loaded from json file containing train data.*/
-    nlohmann::json jsonData;
+    JsonFileHandler m_jsonHandler;
 
 public:
     TrainHandler();
@@ -63,7 +63,7 @@ public:
 
     void Draw(std::shared_ptr<SpriteRenderer> rend);
     void Update(float deltaTime);
-    void LoadPaths(const std::string_view path);
+    void LoadPaths();
     void AddTrain(const std::string& name, std::string_view trainName, const std::vector<glm::vec2>& path);
     void ExtendService(std::string_view trainName, const std::vector<glm::vec2>& path);
 };
