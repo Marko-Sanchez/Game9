@@ -1,7 +1,6 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "scene/Camera.h"
 #include <GLFW/glfw3.h>
 #include <memory>
 
@@ -20,10 +19,9 @@ private:
     float m_lastMouseY;
     float m_frameDelta;
 
-    Camera m_camera;
-    bool m_firstMouseMovement;
-
     std::shared_ptr<GLFWwindow> m_window;
+
+    bool m_firstMouseMovement;
 
 public:
     Window(std::shared_ptr<GLFWwindow> window, int width, int height);
@@ -39,7 +37,8 @@ private:
     // callbacks.
     void ProcessWindowSizeCallback(int width, int height);
     void ProcessKeyboardCallback(int key, int scancode, int action, int mods);
-    void ProcessMouseCallback(double xPosIn, double yPosIn);
+    void ProcessMousePressCallback(int button, int action, int mods);
+    void ProcessMousePosCallback(double xPosIn, double yPosIn);
     void ProcessMouseScrollCallback(double xPosIn, double yPosIn);
 };
 }// namespace Game9

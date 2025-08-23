@@ -4,6 +4,7 @@
 #include <array>
 #include <filesystem>
 #include <iostream>
+#include <format>
 #include <stb/stb_image.h>
 #include <system_error>
 
@@ -27,9 +28,14 @@ m_window(window)
         reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessKeyboardCallback(key, scancode, action, mods);
     });
 
+    glfwSetMouseButtonCallback(m_window.get(), [](GLFWwindow* window, int button, int action, int mods)
+    {
+        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessMousePressCallback(button, action, mods);
+    });
+
     glfwSetCursorPosCallback(m_window.get(), [](GLFWwindow* window, double xPosIn, double yPosIn)
     {
-        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessMouseCallback(xPosIn, yPosIn);
+        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessMousePosCallback(xPosIn, yPosIn);
     });
 
     glfwSetScrollCallback(m_window.get(), [](GLFWwindow* window, double xPosIn, double yPosIn)
@@ -106,10 +112,25 @@ void Window::ProcessWindowSizeCallback(int width, int height)
 
 void Window::ProcessKeyboardCallback(int key, int scancode, int action, int mods)
 {
-    m_camera.ProcessKeyboardInput(key, m_frameDelta);
 }
 
-void Window::ProcessMouseCallback(double xPosIn, double yPosIn)
+void Window::ProcessMousePressCallback(int button, int action, int mods)
+{
+    if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_LEFT)
+    {
+        std::cout << std::format("Mouse button pressed: x {}, y: {}\n", m_lastMouseX, m_lastMouseY);
+    }
+}
+
+/*
+ * Called whenever mouse is moved in current context window.
+ * Top-left is (0,0), bottom-left is (0, 1024).
+ *
+ * Note: when drawing object models and handling object movement,
+ * bottom-left is considered (0, 0). Hence, we subtract current y position
+ * with window height.
+ */
+void Window::ProcessMousePosCallback(double xPosIn, double yPosIn)
 {
     float xpos{static_cast<float>(xPosIn)};
     float ypos{static_cast<float>(yPosIn)};
@@ -124,13 +145,12 @@ void Window::ProcessMouseCallback(double xPosIn, double yPosIn)
     float xoffset{xpos - m_lastMouseX};
     float yoffset{m_lastMouseY - ypos};
 
+    // Save current mouse position.
     m_lastMouseX = xpos;
-    m_lastMouseY = ypos;
-    m_camera.ProcessMouseMovement(xoffset, yoffset);
+    m_lastMouseY = m_height - ypos;
 }
 
 void Window::ProcessMouseScrollCallback(double xPosIn, double yPosIn)
 {
-    m_camera.ProcessMouseScroll(static_cast<float>(yPosIn));
 }
 }// namespace Game9
