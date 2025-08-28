@@ -15,6 +15,8 @@ private:
     int m_width;
     int m_height;
 
+    float m_zoomFactor;
+
     float m_lastMouseX;
     float m_lastMouseY;
     float m_frameDelta;
@@ -30,6 +32,8 @@ public:
 
     int GetWidth() const;
     int GetHeight() const;
+
+    float GetZoom() const;
 
 private:
     void SetWindowIcon();

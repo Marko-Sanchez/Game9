@@ -14,7 +14,8 @@ namespace Game9
 Window::Window(std::shared_ptr<GLFWwindow> window, int width, int height):
 m_width(width),
 m_height(height),
-m_window(window)
+m_window(window),
+m_zoomFactor(1.0f)
 {
     glfwSetWindowUserPointer(m_window.get(), this);
 
@@ -59,6 +60,11 @@ int Window::GetWidth() const
 int Window::GetHeight() const
 {
     return m_height;
+}
+
+float Window::GetZoom() const
+{
+    return m_zoomFactor;
 }
 
 // Note:
@@ -152,5 +158,16 @@ void Window::ProcessMousePosCallback(double xPosIn, double yPosIn)
 
 void Window::ProcessMouseScrollCallback(double xPosIn, double yPosIn)
 {
+    m_zoomFactor += yPosIn * 0.1f;
+    if (m_zoomFactor > 1.5f)
+    {
+        m_zoomFactor = 1.5f;
+    }
+    else if (m_zoomFactor < 0.5f)
+    {
+        m_zoomFactor = 0.5f;
+    }
+
+    std::cout << std::format("zoom: {}, delta: {} ", m_zoomFactor, yPosIn * 0.1f) << std::endl;
 }
 }// namespace Game9
