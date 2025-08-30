@@ -17,15 +17,15 @@ public:
     float m_rotation;
 
     // Global space information.
-    glm::mat4 m_globalMatrix;
+    glm::mat4 m_parentMatrix;
 
     Transform();
     Transform(glm::mat4 globalmatrix, glm::vec2 pos, glm::vec2 scale, float rotation);
 
     glm::mat4 ComputeLocalModelMatrix();
-    glm::mat4 ComputeGlobalModelMatrix();
+    glm::mat4 ComputeParentModelMatrix();
 
-    void SetGlobalMatrix(const glm::mat4& parentGlobalMatrix);
+    void SetParentMatrix(const glm::mat4& parentGlobalMatrix);
 };
 }
 #endif
