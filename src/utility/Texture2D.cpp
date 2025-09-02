@@ -31,8 +31,10 @@ int Texture2D::GetTextureSlot() const noexcept
     return m_textureSlot;
 }
 
+/* Sets active texture and binds. */
 void Texture2D::Bind() const
 {
+    glActiveTexture(GL_TEXTURE0 + m_textureSlot);
     glBindTexture(GL_TEXTURE_2D, m_ID);
 }
 
@@ -42,7 +44,7 @@ void Texture2D::UnBind() const
 }
 
 /*
-* Generates a 2D texture from the given path.
+* Generates a 2D texture from the given path and sets active texture slot.
 *
 * @params:
 * texturePath: path to 2D texture.
@@ -61,8 +63,7 @@ void Texture2D::GenerateTexture(const std::string_view& texturePath, int texture
     if (buffer.get())
     {
         glGenTextures(1, &m_ID);
-        glActiveTexture(GL_TEXTURE0 + textureSlot);
-        Bind();
+        this->Bind();
 
         glTexImage2D(GL_TEXTURE_2D, 0, m_internalFormat, m_width, m_height, 0, m_imageFormat, GL_UNSIGNED_BYTE, buffer.get());
 
@@ -71,7 +72,7 @@ void Texture2D::GenerateTexture(const std::string_view& texturePath, int texture
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_filterMin);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_filterMax);
 
-        UnBind();
+        this->UnBind();
     }
     else
     {
