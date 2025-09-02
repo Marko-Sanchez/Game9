@@ -7,8 +7,10 @@
 
 #include <memory>
 
+#include "glm/fwd.hpp"
 #include "utility/Shader.h"
 #include "utility/Texture2D.h"
+#include "utility/Transform.h"
 
 /*
 * Manages a Sprite using a given shader and allows modification to its' model matrix.
@@ -25,8 +27,12 @@ public:
     ~SpriteRenderer();
 
     void DrawSprite(std::shared_ptr<Texture2D> texture, glm::vec2 position = glm::vec2(0.0f), glm::vec2 size = glm::vec2(10.0f, 10.0f), float rotate = 0.0f);
+    void DrawSprite(std::shared_ptr<Texture2D> texture, Game9::Transform transform);
+
+    void UpdateProjection(const glm::mat4& projection);
 
 private:
     void initRenderData();
+    void Draw();
 };
 #endif

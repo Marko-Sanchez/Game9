@@ -49,12 +49,28 @@ void SpriteRenderer::DrawSprite(std::shared_ptr<Texture2D> texture, glm::vec2 po
     m_shader->SetUniformMat4f("u_model", model);
     m_shader->SetUniform1i("u_image", texture->GetTextureSlot());
 
-    glActiveTexture(GL_TEXTURE0 + texture->GetTextureSlot());
     texture->Bind();
+    this->Draw();
+}
 
-    glBindVertexArray(m_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindVertexArray(0);
+void SpriteRenderer::DrawSprite(std::shared_ptr<Texture2D> texture, Game9::Transform transform)
+{
+    m_shader->Bind();
+
+    m_shader->SetUniformMat4f("u_model",transform.ComputeLocalModelMatrix());
+    m_shader->SetUniform1i("u_image", texture->GetTextureSlot());
+
+    texture->Bind();
+    this->Draw();
+}
+
+/*
+ * Updates projection matrix value but does not make a draw call.
+ */
+void SpriteRenderer::UpdateProjection(const glm::mat4& projection)
+{
+    m_shader->Bind();
+    m_shader->SetUniformMat4f("u_projection", projection);
 }
 
 /*
@@ -91,5 +107,15 @@ void SpriteRenderer::initRenderData()
 
     // UnBind.
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+
+/*
+* Binds vertex array and makes a draw call.
+*/
+void SpriteRenderer::Draw()
+{
+    glBindVertexArray(m_vao);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 }
