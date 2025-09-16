@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <memory>
+
 #include "entity/TrainHandler.h"
 #include "utility/SpriteRenderer.h"
 #include "scene/SceneHandler.h"
@@ -8,8 +10,6 @@
 #include <GLFW/glfw3.h>
 
 #include "ui/window.h"
-
-#include <memory>
 
 enum class GameState
 {
@@ -22,7 +22,7 @@ class Game
 {
 private:
     GameState m_state;
-    Game9::Window m_window;
+    std::shared_ptr<Game9::Window> m_window;
 
     std::unique_ptr<Game9::SceneHandler> m_background;
     std::unique_ptr<Game9::TrainHandler> m_trainHandler;

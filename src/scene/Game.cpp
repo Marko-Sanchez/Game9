@@ -7,11 +7,11 @@
 
 #include "utility/ResourceManager.h"
 
-
 Game::Game(std::shared_ptr<GLFWwindow> window, int width, int height):
-m_state(GameState::GAME_ACTIVE),
-m_window(window, width, height)
-{}
+m_state(GameState::GAME_ACTIVE)
+{
+    m_window = std::make_shared<Game9::Window>(window, width, height);
+}
 
 Game::~Game()
 {
@@ -30,7 +30,8 @@ void Game::Init()
 
     // Configure shaders:
     // bottom-left corner is (0,0) top-right is (width, height).
-    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(m_window.GetWidth()), 0.0f, static_cast<float>(m_window.GetHeight()), -1.0f, 1.0f);
+
+    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(m_window->GetWidth()), 0.0f, static_cast<float>(m_window->GetHeight()), -1.0f, 1.0f);
 
     ResourceManager::GetShader("background").value()->Bind();
     ResourceManager::GetShader("background").value()->SetUniform1i("u_image", 0);
@@ -40,21 +41,35 @@ void Game::Init()
     ResourceManager::GetShader("train").value()->SetUniform1i("u_image", 1);
     ResourceManager::GetShader("train").value()->SetUniformMat4f("u_projection", projection);
 
+    m_background = std::make_unique<Game9::SceneHandler>(ResourceManager::GetShader("background").value(),
+                                                         m_window,
+                                                         ResourceManager::LoadTexture("resources/images/background.png", "background", 0).value());
     m_trainHandler = std::make_unique<Game9::TrainHandler>();
-
-    // TODO: temp for testing. (static-renderer, etc.)
-    sceneRenderer = std::make_unique<SpriteRenderer>(ResourceManager::GetShader("background").value());
     entityRenderer = std::make_unique<SpriteRenderer>(ResourceManager::GetShader("train").value());
 
-    // Load Textures.
-    ResourceManager::LoadTexture("resources/images/background.png", "background", 0);
-
+    // loads all game assest.
     m_trainHandler->LoadPaths();
 }
 
+/*
+* TODO: Handling the world loader.
+* 1. Similiar to trainHandler but for worlds.
+* 2. Should be able to handle multiple worlds: LA, SD
+*/
 void Game::Render()
 {
-    sceneRenderer->DrawSprite(ResourceManager::GetTexture("background").value(), glm::vec2(0.0f, 0.0f), glm::vec2(static_cast<float>(m_window.GetWidth()), static_cast<float>(m_window.GetHeight())));
+    const float w{static_cast<float>(m_window->GetWidth())};
+    const float h{static_cast<float>(m_window->GetHeight())};
+
+    const float hw{(w * m_window->GetZoom()) * 0.5f};
+    const float hh{(h * m_window->GetZoom()) * 0.5f};
+
+    m_background->UpdateProjection(
+    glm::ortho(w * 0.5f - hw, w * 0.5f + hw,
+               h * 0.5f - hh, h * 0.5f + hh,
+               -1.0f, 1.0f));
+
+    m_background->Draw();
     m_trainHandler->Draw(entityRenderer);
 }
 
@@ -68,5 +83,5 @@ void Game::Update(float deltaTime)
 
 void Game::ProcessInput(float deltaTime)
 {
-    m_window.Tick(deltaTime);
+    m_window->Tick(deltaTime);
 }
