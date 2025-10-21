@@ -2,49 +2,56 @@
 
 #include <GLFW/glfw3.h>
 #include <array>
+#include <cassert>
 #include <filesystem>
 #include <iostream>
 #include <format>
 #include <stb/stb_image.h>
 #include <system_error>
 
-namespace Game9
+namespace Core
 {
 
-Window::Window(std::shared_ptr<GLFWwindow> window, int width, int height):
-m_width(width),
-m_height(height),
-m_window(window),
+Window::Window(const WindowSpecification& specification):
+m_specification(specification),
 m_zoomFactor(1.0f)
+{}
+
+void Window::Create()
 {
-    glfwSetWindowUserPointer(m_window.get(), this);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    glfwSetWindowSizeCallback(m_window.get(), [](GLFWwindow* window, int width, int height)
+    m_handle = glfwCreateWindow(m_specification.width, m_specification.height, m_specification.title.c_str(), nullptr, nullptr);
+    if (!m_handle)
     {
-        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessWindowSizeCallback(width, height);
-    });
+        std::cerr << "Window failed to Create" << std::endl;
+        assert(false);
+    }
 
-    glfwSetKeyCallback(m_window.get(), [](GLFWwindow* window, int key, int scancode, int action, int mods)
-    {
-        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessKeyboardCallback(key, scancode, action, mods);
-    });
+    // Make Window Current Context, set swap interval to wait for 1 screen update before swapping buffers.
+    glfwMakeContextCurrent(m_handle);
+    glfwSwapInterval(1);
+}
 
-    glfwSetMouseButtonCallback(m_window.get(), [](GLFWwindow* window, int button, int action, int mods)
-    {
-        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessMousePressCallback(button, action, mods);
-    });
+void Window::Destroy()
+{
+    if (m_handle)
+        glfwDestroyWindow(m_handle);
 
-    glfwSetCursorPosCallback(m_window.get(), [](GLFWwindow* window, double xPosIn, double yPosIn)
-    {
-        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessMousePosCallback(xPosIn, yPosIn);
-    });
+    m_handle = nullptr;
+}
 
-    glfwSetScrollCallback(m_window.get(), [](GLFWwindow* window, double xPosIn, double yPosIn)
-    {
-        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessMouseScrollCallback(xPosIn, yPosIn);
-    });
+bool Window::ShouldClose()
+{
+    return glfwWindowShouldClose(m_handle) != 0;
+}
 
-    /* SetWindowIcon(); */
+// Swap Front buffer (currently being displayed) and back buffer (next to render).
+void Window::Update()
+{
+    glfwSwapBuffers(m_handle);
 }
 
 void Window::Tick(float frameDelta)
@@ -52,14 +59,9 @@ void Window::Tick(float frameDelta)
     m_frameDelta = frameDelta;
 }
 
-int Window::GetWidth() const
+WindowSpecification Window::GetWindowSpecification() const
 {
-    return m_width;
-}
-
-int Window::GetHeight() const
-{
-    return m_height;
+    return m_specification;
 }
 
 float Window::GetZoom() const
@@ -107,13 +109,43 @@ void Window::SetWindowIcon()
         return;
     }
 
-    glfwSetWindowIcon(m_window.get(), 3, icons);
+    glfwSetWindowIcon(m_handle, 3, icons);
+}
+
+void Window::SetWindowCallbacks()
+{
+    glfwSetWindowUserPointer(m_handle, this);
+
+    glfwSetWindowSizeCallback(m_handle, [](GLFWwindow* window, int width, int height)
+    {
+        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessWindowSizeCallback(width, height);
+    });
+
+    glfwSetKeyCallback(m_handle, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+    {
+        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessKeyboardCallback(key, scancode, action, mods);
+    });
+
+    glfwSetMouseButtonCallback(m_handle, [](GLFWwindow* window, int button, int action, int mods)
+    {
+        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessMousePressCallback(button, action, mods);
+    });
+
+    glfwSetCursorPosCallback(m_handle, [](GLFWwindow* window, double xPosIn, double yPosIn)
+    {
+        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessMousePosCallback(xPosIn, yPosIn);
+    });
+
+    glfwSetScrollCallback(m_handle, [](GLFWwindow* window, double xPosIn, double yPosIn)
+    {
+        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessMouseScrollCallback(xPosIn, yPosIn);
+    });
 }
 
 void Window::ProcessWindowSizeCallback(int width, int height)
 {
-    m_width  = width;
-    m_height = height;
+    m_specification.width  = width;
+    m_specification.height = height;
 }
 
 void Window::ProcessKeyboardCallback(int key, int scancode, int action, int mods)
@@ -153,7 +185,7 @@ void Window::ProcessMousePosCallback(double xPosIn, double yPosIn)
 
     // Save current mouse position.
     m_lastMouseX = xpos;
-    m_lastMouseY = m_height - ypos;
+    m_lastMouseY = m_specification.height - ypos;
 }
 
 void Window::ProcessMouseScrollCallback(double xPosIn, double yPosIn)
@@ -170,4 +202,4 @@ void Window::ProcessMouseScrollCallback(double xPosIn, double yPosIn)
 
     std::cout << std::format("zoom: {}, delta: {} ", m_zoomFactor, yPosIn * 0.1f) << std::endl;
 }
-}// namespace Game9
+}// namespace Core

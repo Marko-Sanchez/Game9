@@ -2,42 +2,55 @@
 #define WINDOW_H
 
 #include <GLFW/glfw3.h>
-#include <memory>
+#include <string>
 
-namespace Game9
+namespace Core
 {
+
+struct WindowSpecification
+{
+    unsigned int width{1024};
+    unsigned int height{1024};
+    std::string title;
+
+    bool isResizeable;
+};
+
 /*
 * Handles window context, and glfw callbacks.
 */
 class Window
 {
 private:
-    int m_width;
-    int m_height;
-
     float m_zoomFactor;
 
     float m_lastMouseX;
     float m_lastMouseY;
     float m_frameDelta;
 
-    std::shared_ptr<GLFWwindow> m_window;
-
+    GLFWwindow* m_handle;
     bool m_firstMouseMovement;
 
+    WindowSpecification m_specification;
+
 public:
-    Window(std::shared_ptr<GLFWwindow> window, int width, int height);
+    Window(const WindowSpecification& specification);
+
+    void Create();
+    void Destroy();
+    bool ShouldClose();
+
+    void Update();
 
     void Tick(float frameDelta);
 
-    int GetWidth() const;
-    int GetHeight() const;
-
+    WindowSpecification GetWindowSpecification() const;
     float GetZoom() const;
 
 private:
     void SetWindowIcon();
 
+    void SetWindowCallbacks();
     // callbacks.
     void ProcessWindowSizeCallback(int width, int height);
     void ProcessKeyboardCallback(int key, int scancode, int action, int mods);
@@ -45,6 +58,6 @@ private:
     void ProcessMousePosCallback(double xPosIn, double yPosIn);
     void ProcessMouseScrollCallback(double xPosIn, double yPosIn);
 };
-}// namespace Game9
+}// namespace Core
 
 #endif
