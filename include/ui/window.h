@@ -28,7 +28,7 @@ private:
     float m_lastMouseY;
     float m_frameDelta;
 
-    GLFWwindow* m_handle;
+    GLFWwindow* m_handle = nullptr;
     bool m_firstMouseMovement;
 
     WindowSpecification m_specification;
