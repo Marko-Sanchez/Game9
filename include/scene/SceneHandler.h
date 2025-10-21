@@ -26,11 +26,11 @@ private:
 
     SpriteRenderer m_renderer;
 
-    std::shared_ptr<Window> m_window;
+    std::shared_ptr<Core::Window> m_window;
     std::shared_ptr<Texture2D> m_texture;
 
 public:
-    SceneHandler(SpriteRenderer renderer, std::shared_ptr<Window> window, std::shared_ptr<Texture2D> texture);
+    SceneHandler(SpriteRenderer renderer, std::shared_ptr<Core::Window> window, std::shared_ptr<Texture2D> texture);
 
     void Draw();
     void UpdateModel(const Transform& model);

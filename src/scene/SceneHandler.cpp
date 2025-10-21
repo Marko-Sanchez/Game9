@@ -2,12 +2,13 @@
 
 namespace Game9
 {
-SceneHandler::SceneHandler(SpriteRenderer renderer, std::shared_ptr<Window> window, std::shared_ptr<Texture2D> texture):
+SceneHandler::SceneHandler(SpriteRenderer renderer, std::shared_ptr<Core::Window> window, std::shared_ptr<Texture2D> texture):
 m_renderer(renderer),
 m_window(window),
 m_texture(texture)
 {
-    m_model.m_scale = glm::vec2(static_cast<float>(m_window->GetWidth() * 2), static_cast<float>(m_window->GetHeight() * 2));
+    auto windowspec = m_window->GetWindowSpecification();
+    m_model.m_scale = glm::vec2(static_cast<float>(windowspec.width * 2), static_cast<float>(windowspec.height * 2));
 }
 
 void SceneHandler::Draw()
