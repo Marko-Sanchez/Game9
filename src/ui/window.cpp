@@ -17,6 +17,11 @@ m_specification(specification),
 m_zoomFactor(1.0f)
 {}
 
+Window::~Window()
+{
+    Destroy();
+}
+
 void Window::Create()
 {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
