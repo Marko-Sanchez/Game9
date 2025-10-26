@@ -4,19 +4,50 @@
 #include "glm/ext/vector_float2.hpp"
 
 #include <GL/gl.h>
+#include <GLFW/glfw3.h>
 
 #include "utility/ResourceManager.h"
+#include <iostream>
 
-Game::Game(std::shared_ptr<GLFWwindow> window, int width, int height):
-m_state(GameState::GAME_ACTIVE)
+namespace Core
 {
-    m_window = std::make_shared<Game9::Window>(window, width, height);
+static void GLFWErrorCallback(int error, const char* description)
+{
+    std::cerr << "[GLFW Error]: " << description << std::endl;
+}
+
+Game::Game(const ApplicationSpecification& specification):
+m_specification(specification)
+{
+    glfwSetErrorCallback(GLFWErrorCallback);
+    glfwInit();
+
+    if (m_specification.windowspec.title.empty())
+    {
+        m_specification.windowspec.title = m_specification.name;
+    }
+
+    m_window = std::make_shared<Window>(m_specification.windowspec);
+    m_window->Create();
+
+    // OpenGL configuration.
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    if (GLenum err = glewInit(); err != GLEW_OK)
+    {
+        std::cerr << "Failed to Initialize GLEW\nNeeds a valid OpenGL Context: Window::Create()?\n";
+        std::cerr << "Error: " << glewGetErrorString(err) << std::endl;
+    }
 }
 
 Game::~Game()
 {
     sceneRenderer.reset();
     entityRenderer.reset();
+
+    m_window->Destroy();
+    glfwTerminate();
 }
 
 /*
@@ -31,7 +62,7 @@ void Game::Init()
     // Configure shaders:
     // bottom-left corner is (0,0) top-right is (width, height).
 
-    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(m_window->GetWidth()), 0.0f, static_cast<float>(m_window->GetHeight()), -1.0f, 1.0f);
+    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(m_specification.windowspec.width), 0.0f, static_cast<float>(m_specification.windowspec.height), -1.0f, 1.0f);
 
     ResourceManager::GetShader("background").value()->Bind();
     ResourceManager::GetShader("background").value()->SetUniform1i("u_image", 0);
@@ -51,15 +82,54 @@ void Game::Init()
     m_trainHandler->LoadPaths();
 }
 
+void Game::Run()
+{
+    m_isRunning = true;
+
+    this->Init();
+
+    float lastFrame{};
+    float deltaTime{};
+    while (m_isRunning)
+    {
+        if (m_window->ShouldClose())
+        {
+            m_isRunning = false;
+            break;
+        }
+
+        // Calculate delta time and processes callbacks.
+        float currentFrame{static_cast<float>(glfwGetTime())};
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        glfwPollEvents();
+
+        // manage user input.
+        /* this->ProcessInput(deltaTime); */
+
+        // TODO: update game state.
+        this->Update(deltaTime);
+
+        // Render.
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        this->Render();
+
+        m_window->Update();
+    }
+}
+
 /*
 * TODO: Handling the world loader.
 * 1. Similiar to trainHandler but for worlds.
 * 2. Should be able to handle multiple worlds: LA, SD
+*
+* 3. go to Window to manage mouse or arrow key callbacks to, to be able to move space around.
 */
 void Game::Render()
 {
-    const float w{static_cast<float>(m_window->GetWidth())};
-    const float h{static_cast<float>(m_window->GetHeight())};
+    const float w{static_cast<float>(m_specification.windowspec.width)};
+    const float h{static_cast<float>(m_specification.windowspec.height)};
 
     const float hw{(w * m_window->GetZoom()) * 0.5f};
     const float hh{(h * m_window->GetZoom()) * 0.5f};
@@ -75,13 +145,11 @@ void Game::Render()
 
 void Game::Update(float deltaTime)
 {
-    if (m_state == GameState::GAME_ACTIVE)
-    {
-        m_trainHandler->Update(deltaTime);
-    }
+    m_trainHandler->Update(deltaTime);
 }
 
 void Game::ProcessInput(float deltaTime)
 {
     m_window->Tick(deltaTime);
 }
+}// namespace Core

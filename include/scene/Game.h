@@ -1,28 +1,30 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <memory>
-
 #include "entity/TrainHandler.h"
 #include "utility/SpriteRenderer.h"
 #include "scene/SceneHandler.h"
 
+#include "ui/window.h"
 #include <GLFW/glfw3.h>
 
-#include "ui/window.h"
+#include <memory>
 
-enum class GameState
+namespace Core
 {
-    GAME_ACTIVE,
-    GAME_MENU,
-    GAME_WIN
+struct ApplicationSpecification
+{
+    std::string name = "Application";
+    WindowSpecification windowspec;
 };
 
+// Application.
 class Game
 {
 private:
-    GameState m_state;
-    std::shared_ptr<Game9::Window> m_window;
+    ApplicationSpecification m_specification;
+    std::shared_ptr<Window> m_window;
+    bool m_isRunning = false;
 
     std::unique_ptr<Game9::SceneHandler> m_background;
     std::unique_ptr<Game9::TrainHandler> m_trainHandler;
@@ -32,8 +34,10 @@ private:
     std::shared_ptr<SpriteRenderer> entityRenderer;
 
 public:
-    Game(std::shared_ptr<GLFWwindow> window, int width, int height);
+    Game(const ApplicationSpecification& specification = ApplicationSpecification());
     ~Game();
+
+    void Run();
     // intialize game state (load all shaders/textures).
     void Init();
     // Game loop.
@@ -41,4 +45,5 @@ public:
     void ProcessInput(float deltaTime);
     void Update(float deltaTime);
 };
+}// namespace Core
 #endif
