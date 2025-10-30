@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #include "utility/ResourceManager.h"
+#include "utility/SpriteRenderer.h"
 #include <iostream>
 
 namespace Core
@@ -20,7 +21,11 @@ Game::Game(const ApplicationSpecification& specification):
 m_specification(specification)
 {
     glfwSetErrorCallback(GLFWErrorCallback);
-    glfwInit();
+    if (!glfwInit())
+    {
+        std::cerr << "Failed to intialize GLFW." << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
 
     if (m_specification.windowspec.title.empty())
     {
@@ -30,20 +35,19 @@ m_specification(specification)
     m_window = std::make_shared<Window>(m_specification.windowspec);
     m_window->Create();
 
-    // OpenGL configuration.
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     if (GLenum err = glewInit(); err != GLEW_OK)
     {
         std::cerr << "Failed to Initialize GLEW\nNeeds a valid OpenGL Context: Window::Create()?\n";
         std::cerr << "Error: " << glewGetErrorString(err) << std::endl;
     }
+
+    // OpenGL configuration.
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 Game::~Game()
 {
-    sceneRenderer.reset();
     entityRenderer.reset();
 
     m_window->Destroy();
@@ -105,14 +109,15 @@ void Game::Run()
         glfwPollEvents();
 
         // manage user input.
-        /* this->ProcessInput(deltaTime); */
+        // this->ProcessInput(deltaTime);
 
         // TODO: update game state.
         this->Update(deltaTime);
 
-        // Render.
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        // Clear and Render.
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
         this->Render();
 
         m_window->Update();
