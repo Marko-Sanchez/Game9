@@ -15,7 +15,7 @@ namespace Core
 struct ApplicationSpecification
 {
     std::string name = "Application";
-    WindowSpecification windowspec;
+    WindowSpecification windowspec = WindowSpecification();
 };
 
 // Application.
@@ -30,7 +30,6 @@ private:
     std::unique_ptr<Game9::TrainHandler> m_trainHandler;
 
     // Renderers.
-    std::unique_ptr<SpriteRenderer> sceneRenderer;
     std::shared_ptr<SpriteRenderer> entityRenderer;
 
 public:
