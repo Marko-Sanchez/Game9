@@ -1,6 +1,7 @@
 #include "ui/window.h"
 
 #include <GLFW/glfw3.h>
+
 #include <array>
 #include <cassert>
 #include <filesystem>
@@ -13,8 +14,8 @@ namespace Core
 {
 
 Window::Window(const WindowSpecification& specification):
-m_specification(specification),
-m_zoomFactor(1.0f)
+m_zoomFactor(1.0f),
+m_specification(specification)
 {}
 
 Window::~Window()
@@ -24,16 +25,17 @@ Window::~Window()
 
 void Window::Create()
 {
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
     m_handle = glfwCreateWindow(m_specification.width, m_specification.height, m_specification.title.c_str(), nullptr, nullptr);
     if (!m_handle)
     {
         std::cerr << "Window failed to Create" << std::endl;
         assert(false);
     }
+
+    // Necessary to occur after creating Window; Any other version might not work with current code.
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Make Window Current Context, set swap interval to wait for 1 screen update before swapping buffers.
     glfwMakeContextCurrent(m_handle);
