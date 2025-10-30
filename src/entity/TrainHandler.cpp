@@ -62,7 +62,7 @@ m_jsonHandler("resources/gamedata/traindata.json")
     };
 
     // Map trains to their types and load train textures.
-    for (auto i{0}; i < m_texturePaths.size(); ++i)
+    for (size_t i{0}; i < m_texturePaths.size(); ++i)
     {
         auto [trainName, trainType] = parsefilename(m_texturePaths[i]);
         if (!trainName.empty() && !trainType.empty())
