@@ -12,6 +12,9 @@
 
 namespace Core
 {
+/*
+ * Set GLFW to call this function in case of error.
+ */
 static void GLFWErrorCallback(int error, const char* description)
 {
     std::cerr << "[GLFW Error]: " << description << std::endl;
@@ -115,7 +118,7 @@ void Game::Run()
         this->Update(deltaTime);
 
         // Clear and Render.
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         this->Render();
