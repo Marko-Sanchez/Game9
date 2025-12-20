@@ -69,7 +69,7 @@ m_jsonHandler("resources/gamedata/traindata.json")
         {
             m_trainIdentifier[trainName] = toTrainType(trainType);
             // TODO: in the future all trains will be in a single texture file.
-            ResourceManager::LoadTexture(m_texturePaths[i], trainName, i + 1);
+            m_resourceManager.LoadTexture(m_texturePaths[i], trainName, i + 1);
         }
     }
 }
@@ -121,7 +121,7 @@ void TrainHandler::LoadPaths()
         std::string trainName  = train["trainName"].template get<std::string>();
 
         // TODO: getting values for model: initial position, size, and velocity.
-        m_trains.try_emplace(objectName, ResourceManager::GetTexture(trainName).value(), glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), glm::vec2(64, 64), glm::vec2(50, 50));
+        m_trains.try_emplace(objectName, m_resourceManager.GetTexture(trainName), glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), glm::vec2(64, 64), glm::vec2(50, 50));
         m_trains[objectName].SetPath(path);
     }
 }
@@ -151,6 +151,6 @@ void TrainHandler::AddTrain(const std::string& name, std::string_view trainName,
     m_jsonHandler.m_jsonData["trains"].emplace_back(train);
     std::cout << std::setw(4) << m_jsonHandler.m_jsonData << std::endl;
 
-    m_trains.try_emplace(name, ResourceManager::GetTexture(trainName).value(), glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), glm::vec2(64, 64), glm::vec2(50, 50));
+    m_trains.try_emplace(name, m_resourceManager.GetTexture(trainName), glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), glm::vec2(64, 64), glm::vec2(50, 50));
 }
 }// namespace Game9

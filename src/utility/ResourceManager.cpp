@@ -10,22 +10,59 @@
 #include <string_view>
 #include <system_error>
 
+namespace Core::util
+{
+
+/**************** ShaderFileHandler ************************/
+
+// explicit prevents implicit conversion of uid to a ShaderFileHandler.
+// ex. SomeFunc(1) -> SomeFunc(ShaderFileHandler).
+ResourceManager::ShaderFileHandler::ShaderFileHandler(unsigned int id):
+ID(id)
+{}
+
+ResourceManager::ShaderFileHandler::~ShaderFileHandler()
+{
+    if (ID) glDeleteShader(ID);
+}
+
+// Move constructor.
+ResourceManager::ShaderFileHandler::ShaderFileHandler(ShaderFileHandler&& other) noexcept:
+ID(other.ID)
+{
+    other.ID = 0;
+}
+
+// Move Assignment: Delete own ID and copy other's ID.
+ResourceManager::ShaderFileHandler& ResourceManager::ShaderFileHandler::operator=(ShaderFileHandler&& other) noexcept
+{
+    if (this != &other)
+    {
+        if (ID) glDeleteShader(ID);
+        ID = other.ID;
+        other.ID = 0;
+    }
+    return *this;
+}
+
+/**************** ShaderFileHandler ************************/
+
 /*
  * Parses and compiles vertex and fragment shader files. If shader path already exist,
  * create a new shader and attach the already created shader id to a new program.
 */
-std::optional<ResourceManager::shared_shader> ResourceManager::LoadShader(const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view shaderName)
+std::shared_ptr<Shader> ResourceManager::LoadShader(const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view shaderName)
 {
     std::error_code ec;
     if (!std::filesystem::exists(vertexPath, ec) || !std::filesystem::exists(fragmentPath, ec))
     {
         std::cerr << "Shader path not found:\n" << ec.message() << std::endl;
-        return std::nullopt;
+        return nullptr;
     }
     else if (auto shaderIter = m_shader.find(shaderName); shaderIter != m_shader.end())
     {
         std::cerr << "Shader already exist with this name: " << shaderName << std::endl;
-        return std::nullopt;
+        return nullptr;
     }
 
     auto vertexIter   = m_files.find(vertexPath);
@@ -49,54 +86,54 @@ std::optional<ResourceManager::shared_shader> ResourceManager::LoadShader(const 
     auto shader = std::make_shared<Shader>(vID, fID);
     shader->CreateShader();
 
-    std::string name{shaderName};
-    m_shader.emplace(name, shader);
-
-    return m_shader[name];
+    m_shader.emplace(std::string{shaderName}, shader);
+    return shader;
 }
 
+// should resource manager simply handle the loading of textures and loading of shaders->enum.
+
 // TODO: Figure file paths, in the case were user does not call executable from source directory.
-std::optional<ResourceManager::shared_texture> ResourceManager::LoadTexture(const std::string_view texturePath, const std::string_view textureName, const int textureSlot)
+// whatever object handles the texture should deal with the texture-name
+std::shared_ptr<Texture2D> ResourceManager::LoadTexture(const std::string_view texturePath, const std::string_view textureName, const int textureSlot)
 {
     std::error_code ec;
     if (!std::filesystem::exists(texturePath, ec))
     {
         std::cerr << "Texture path not found:\n" << ec.message() << std::endl;
-        return std::nullopt;
+        return nullptr;
     }
 
     if (auto iter = m_textures.find(textureName); iter != m_textures.end())
     {
         std::cerr << "Texture already exist with this name: " << textureName << std::endl;
-        return std::nullopt;
+        return nullptr;
     }
 
-    std::string name{textureName};
     auto texture = std::make_shared<Texture2D>();
     texture->GenerateTexture(texturePath, textureSlot);
-    m_textures[name] = texture;
+    m_textures.emplace(std::string{textureName}, texture);
 
-    return m_textures[name];
+    return texture;
 }
 
-std::optional<ResourceManager::shared_shader> ResourceManager::GetShader(const std::string_view shaderName)
+std::shared_ptr<Shader> ResourceManager::GetShader(const std::string_view shaderName)
 {
     if (auto iter = m_shader.find(shaderName); iter != m_shader.end())
     {
         return iter->second;
     }
 
-    return std::nullopt;
+    return nullptr;
 }
 
-std::optional<ResourceManager::shared_texture> ResourceManager::GetTexture(const std::string_view textureName)
+std::shared_ptr<Texture2D> ResourceManager::GetTexture(const std::string_view textureName)
 {
     if (auto iter = m_textures.find(textureName); iter != m_textures.end())
     {
         return iter->second;
     }
 
-    return std::nullopt;
+    return nullptr;
 }
 
 /*
@@ -108,13 +145,13 @@ std::optional<ResourceManager::shared_texture> ResourceManager::GetTexture(const
 * width: reference to width, will be updated by stbi_load.
 * height: reference to height, will be updated by stbi_load.
 */
-std::optional<ResourceManager::shared_image> ResourceManager::LoadImage(const std::string_view path, int& width, int& height)
+std::shared_ptr<unsigned char> ResourceManager::LoadImage(const std::string_view path, int& width, int& height)
 {
     std::error_code ec;
     if (!std::filesystem::exists(path, ec))
     {
         std::cerr << "Path not found:\n" << ec.message() << std::endl;
-        return std::nullopt;
+        return nullptr;
     }
 
     return std::shared_ptr<unsigned char>(stbi_load(path.data(), &width, &height, 0, 4), stbi_image_free);
@@ -184,3 +221,4 @@ unsigned int ResourceManager::CompileShader(unsigned int type, const std::string
 
     return id;
 }
+}// namespace Core::util

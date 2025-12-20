@@ -8,74 +8,53 @@
 
 #include <memory>
 #include <functional>
-#include <optional>
 #include <string>
 #include <map>
 
+namespace Core::util
+{
+// Loads and unloads resources. Keeps track of object ID's for shaders and textures.
 class ResourceManager
 {
 private:
-    using shared_shader  = std::shared_ptr<Shader>;
-    using shared_texture = std::shared_ptr<Texture2D>;
-    using shared_image   = std::shared_ptr<unsigned char>;
 
     // RAII: Holds compiled shader file ID.
     struct ShaderFileHandler
     {
         unsigned int ID;
 
-        // explicit prevents implicit conversion of uid to a ShaderFileHandler.
-        // ex. SomeFunc(1) -> SomeFunc(ShaderFileHandler).
-        explicit ShaderFileHandler(unsigned int id):ID(id){}
-        ~ShaderFileHandler()
-        {
-            if (ID) glDeleteShader(ID);
-        }
+        explicit ShaderFileHandler(unsigned int id);
+        ~ShaderFileHandler();
 
-        // Move Contructor:
-        ShaderFileHandler(ShaderFileHandler&& other) noexcept:
-        ID(other.ID)
-        {
-            other.ID = 0;
-        }
-        // Move Assignment: Delete own ID and copy other's ID.
-        ShaderFileHandler& operator=(ShaderFileHandler&& other) noexcept
-        {
-            if (this != &other)
-            {
-                if (ID) glDeleteShader(ID);
-                ID = other.ID;
-                other.ID = 0;
-            }
-            return *this;
-        }
-        // Copy Contructor:
+        ShaderFileHandler(ShaderFileHandler&& other) noexcept;
+        ShaderFileHandler& operator=(ShaderFileHandler&& other) noexcept;
+
         ShaderFileHandler(const ShaderFileHandler&) = delete;
-        // Copy Assignment:
         ShaderFileHandler& operator=(const ShaderFileHandler&) = delete;
     };
 
-public:
     // std::string_view file path, ShaderFileHandler is from compileshader.
-    inline static std::map<std::string, ShaderFileHandler, std::less<>> m_files;
+    std::map<std::string, ShaderFileHandler, std::less<>> m_files;
 
-    inline static std::map<std::string, shared_shader, std::less<>> m_shader;
-    inline static std::map<std::string, shared_texture, std::less<>> m_textures;
+    // shader object should be transformed to open function instead of class functions ??
+    std::map<std::string, std::shared_ptr<Shader>, std::less<>> m_shader;
+    std::map<std::string, std::shared_ptr<Texture2D>, std::less<>> m_textures;
 
-    static std::optional<shared_shader> LoadShader(const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view shaderName);
-    static std::optional<shared_shader> GetShader(const std::string_view shaderName);
+public:
+    std::shared_ptr<Shader> LoadShader(const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view shaderName);
+    std::shared_ptr<Shader> GetShader(const std::string_view shaderName);
 
-    static std::optional<shared_texture> LoadTexture(const std::string_view texturePath, const std::string_view textureName, const int textureSlot);
-    static std::optional<shared_texture> GetTexture(const std::string_view textureName);
+    std::shared_ptr<Texture2D> LoadTexture(const std::string_view texturePath, const std::string_view textureName, const int textureSlot);
+    std::shared_ptr<Texture2D> GetTexture(const std::string_view textureName);
 
-    static std::optional<shared_image> LoadImage(const std::string_view path, int& width, int& height);
+    std::shared_ptr<unsigned char> LoadImage(const std::string_view path, int& width, int& height);
 
     // TODO: function to remove un-used textures and shaders.
 private:
-    ResourceManager() {}
 
-    static std::string ParseShaderFile(const std::string_view& filepath);
-    static unsigned int CompileShader(unsigned int type, const std::string& source);
+    std::string ParseShaderFile(const std::string_view& filepath);
+    unsigned int CompileShader(unsigned int type, const std::string& source);
 
 };
+}// namespace Core::util
 #endif

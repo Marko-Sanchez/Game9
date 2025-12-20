@@ -57,6 +57,9 @@ private:
     /* Data loaded from json file containing train data.*/
     JsonFileHandler m_jsonHandler;
 
+    /* Manage train textures. */
+    Core::util::ResourceManager m_resourceManager;
+
 public:
     TrainHandler();
     ~TrainHandler();

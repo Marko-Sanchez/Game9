@@ -30,6 +30,7 @@ m_specification(specification)
         std::exit(EXIT_FAILURE);
     }
 
+    // Set window specification and create the glfw window context.
     if (m_specification.windowspec.title.empty())
     {
         m_specification.windowspec.title = m_specification.name;
@@ -38,13 +39,13 @@ m_specification(specification)
     m_window = std::make_shared<Window>(m_specification.windowspec);
     m_window->Create();
 
+    // OpenGL configuration.
     if (GLenum err = glewInit(); err != GLEW_OK)
     {
         std::cerr << "Failed to Initialize GLEW\nNeeds a valid OpenGL Context: Window::Create()?\n";
         std::cerr << "Error: " << glewGetErrorString(err) << std::endl;
     }
 
-    // OpenGL configuration.
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
@@ -63,27 +64,30 @@ Game::~Game()
 void Game::Init()
 {
     // Load shaders.
-    ResourceManager::LoadShader("resources/shaders/background.vertex", "resources/shaders/background.fragment", "background");
-    ResourceManager::LoadShader("resources/shaders/background.vertex", "resources/shaders/background.fragment", "train");
+    m_resourceManager.LoadShader("resources/shaders/background.vertex", "resources/shaders/background.fragment", "background");
+    m_resourceManager.LoadShader("resources/shaders/background.vertex", "resources/shaders/background.fragment", "train");
+    // = {
+    // shader-path, name-enumvalue(use to retrieve)
+    // }
 
     // Configure shaders:
     // bottom-left corner is (0,0) top-right is (width, height).
 
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(m_specification.windowspec.width), 0.0f, static_cast<float>(m_specification.windowspec.height), -1.0f, 1.0f);
 
-    ResourceManager::GetShader("background").value()->Bind();
-    ResourceManager::GetShader("background").value()->SetUniform1i("u_image", 0);
-    ResourceManager::GetShader("background").value()->SetUniformMat4f("u_projection", projection);
+    m_resourceManager.GetShader("background")->Bind();
+    m_resourceManager.GetShader("background")->SetUniform1i("u_image", 0);
+    m_resourceManager.GetShader("background")->SetUniformMat4f("u_projection", projection);
 
-    ResourceManager::GetShader("train").value()->Bind();
-    ResourceManager::GetShader("train").value()->SetUniform1i("u_image", 1);
-    ResourceManager::GetShader("train").value()->SetUniformMat4f("u_projection", projection);
+    m_resourceManager.GetShader("train")->Bind();
+    m_resourceManager.GetShader("train")->SetUniform1i("u_image", 1);
+    m_resourceManager.GetShader("train")->SetUniformMat4f("u_projection", projection);
 
-    m_background = std::make_unique<Game9::SceneHandler>(ResourceManager::GetShader("background").value(),
+    m_background = std::make_unique<Game9::SceneHandler>(m_resourceManager.GetShader("background"),
                                                          m_window,
-                                                         ResourceManager::LoadTexture("resources/images/background.png", "background", 0).value());
+                                                         m_resourceManager.LoadTexture("resources/images/background.png", "background", 0));
     m_trainHandler = std::make_unique<Game9::TrainHandler>();
-    entityRenderer = std::make_unique<SpriteRenderer>(ResourceManager::GetShader("train").value());
+    entityRenderer = std::make_unique<SpriteRenderer>(m_resourceManager.GetShader("train"));
 
     // loads all game assest.
     m_trainHandler->LoadPaths();
