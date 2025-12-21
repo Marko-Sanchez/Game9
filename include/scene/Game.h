@@ -2,12 +2,15 @@
 #define GAME_H
 
 #include "entity/TrainHandler.h"
+#include "ui/Layer.h"
 #include "utility/SpriteRenderer.h"
 #include "scene/SceneHandler.h"
 
 #include "ui/window.h"
 #include <GLFW/glfw3.h>
 
+#include <concepts>
+#include <list>
 #include <memory>
 
 namespace Core
@@ -35,6 +38,8 @@ private:
     // Renderers.
     std::shared_ptr<SpriteRenderer> entityRenderer;
 
+    std::list<std::unique_ptr<Layer>> m_layerStack;
+
 public:
     Game(const ApplicationSpecification& specification = ApplicationSpecification());
     ~Game();
@@ -46,6 +51,15 @@ public:
     void Render();
     void ProcessInput(float deltaTime);
     void Update(float deltaTime);
+
+    template<typename TLayer>
+    requires(std::derived_from<TLayer, Layer>)
+    void PushLayer()
+    {
+        m_layerStack.push_back(std::make_unique<TLayer>());
+    }
+
+    friend class Layer;
 };
 }// namespace Core
 #endif
