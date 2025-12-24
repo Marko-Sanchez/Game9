@@ -32,7 +32,6 @@ private:
     // temporary will be moved into class layer, so that each layer handles it's on resources.
     util::ResourceManager m_resourceManager;
 
-    std::unique_ptr<Game9::SceneHandler> m_background;
     std::unique_ptr<Game9::TrainHandler> m_trainHandler;
 
     // Renderers.
