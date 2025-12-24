@@ -52,11 +52,14 @@ public:
     void ProcessInput(float deltaTime);
     void Update(float deltaTime);
 
-    template<typename TLayer>
+    // Share window specification with layers.
+    std::shared_ptr<Window> GetWindow();
+
+    template<typename TLayer, typename ...Args>
     requires(std::derived_from<TLayer, Layer>)
-    void PushLayer()
+    void PushLayer(Args&&... args)
     {
-        m_layerStack.push_back(std::make_unique<TLayer>());
+        m_layerStack.push_back(std::make_unique<TLayer>(std::forward<Args>(args)...));
     }
 
     friend class Layer;

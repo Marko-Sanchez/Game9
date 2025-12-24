@@ -64,7 +64,6 @@ Game::~Game()
 void Game::Init()
 {
     // Load shaders.
-    m_resourceManager.LoadShader("resources/shaders/background.vertex", "resources/shaders/background.fragment", "background");
     m_resourceManager.LoadShader("resources/shaders/background.vertex", "resources/shaders/background.fragment", "train");
     // = {
     // shader-path, name-enumvalue(use to retrieve)
@@ -75,17 +74,10 @@ void Game::Init()
 
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(m_specification.windowspec.width), 0.0f, static_cast<float>(m_specification.windowspec.height), -1.0f, 1.0f);
 
-    m_resourceManager.GetShader("background")->Bind();
-    m_resourceManager.GetShader("background")->SetUniform1i("u_image", 0);
-    m_resourceManager.GetShader("background")->SetUniformMat4f("u_projection", projection);
-
     m_resourceManager.GetShader("train")->Bind();
     m_resourceManager.GetShader("train")->SetUniform1i("u_image", 1);
     m_resourceManager.GetShader("train")->SetUniformMat4f("u_projection", projection);
 
-    m_background = std::make_unique<Game9::SceneHandler>(m_resourceManager.GetShader("background"),
-                                                         m_window,
-                                                         m_resourceManager.LoadTexture("resources/images/background.png", "background", 0));
     m_trainHandler = std::make_unique<Game9::TrainHandler>();
     entityRenderer = std::make_unique<SpriteRenderer>(m_resourceManager.GetShader("train"));
 
@@ -131,37 +123,32 @@ void Game::Run()
     }
 }
 
-/*
-* TODO: Handling the world loader.
-* 1. Similiar to trainHandler but for worlds.
-* 2. Should be able to handle multiple worlds: LA, SD
-*
-* 3. go to Window to manage mouse or arrow key callbacks to, to be able to move space around.
-*/
 void Game::Render()
 {
-    const float w{static_cast<float>(m_specification.windowspec.width)};
-    const float h{static_cast<float>(m_specification.windowspec.height)};
+    for (auto& layer: m_layerStack)
+    {
+        layer->OnRender();
+    }
 
-    const float hw{(w * m_window->GetZoom()) * 0.5f};
-    const float hh{(h * m_window->GetZoom()) * 0.5f};
-
-    m_background->UpdateProjection(
-    glm::ortho(w * 0.5f - hw, w * 0.5f + hw,
-               h * 0.5f - hh, h * 0.5f + hh,
-               -1.0f, 1.0f));
-
-    m_background->Draw();
     m_trainHandler->Draw(entityRenderer);
 }
 
 void Game::Update(float deltaTime)
 {
+    for (auto& layer: m_layerStack)
+    {
+        layer->OnUpdate(deltaTime);
+    }
     m_trainHandler->Update(deltaTime);
 }
 
 void Game::ProcessInput(float deltaTime)
 {
     m_window->Tick(deltaTime);
+}
+
+std::shared_ptr<Window> Game::GetWindow()
+{
+    return m_window;
 }
 }// namespace Core
