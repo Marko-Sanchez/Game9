@@ -1,17 +1,15 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "entity/TrainHandler.h"
-#include "ui/Layer.h"
-#include "utility/SpriteRenderer.h"
-#include "scene/SceneHandler.h"
-
-#include "ui/window.h"
-#include <GLFW/glfw3.h>
-
 #include <concepts>
 #include <list>
 #include <memory>
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
+#include "ui/Layer.h"
+#include "ui/window.h"
 
 namespace Core
 {
@@ -28,14 +26,6 @@ private:
     ApplicationSpecification m_specification;
     std::shared_ptr<Window> m_window;
     bool m_isRunning = false;
-
-    // temporary will be moved into class layer, so that each layer handles it's on resources.
-    util::ResourceManager m_resourceManager;
-
-    std::unique_ptr<Game9::TrainHandler> m_trainHandler;
-
-    // Renderers.
-    std::shared_ptr<SpriteRenderer> entityRenderer;
 
     std::list<std::unique_ptr<Layer>> m_layerStack;
 
