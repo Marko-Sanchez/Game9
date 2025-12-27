@@ -1,7 +1,8 @@
 #include "utility/JsonFileHandler.h"
 
+#include <print>
+#include <cstdio>
 #include <fstream>
-#include <iostream>
 
 namespace glm
 {
@@ -36,7 +37,7 @@ bool JsonFileHandler::Read()
         m_jsonData = nlohmann::json::parse(in);
         if (m_jsonData.is_discarded() || m_jsonData.is_null())
         {
-            std::cerr << "File is empty or null." << std::endl;
+            std::println(stderr, "File is empty or null.");
             m_jsonData["trains"] = nlohmann::json::array();
         }
 
@@ -46,8 +47,7 @@ bool JsonFileHandler::Read()
     {
         m_jsonData = nullptr;
 
-        std::cerr << "message: " << e.what() << '\n'
-                  << "exception id: " << e.id << std::endl;
+        std::println(stderr, "message: {}\nexception id: {}", e.what(), e.id);
         return false;
     }
 }
@@ -67,6 +67,7 @@ bool JsonFileHandler::Write() const
     }
     catch(...)
     {
+        std::println(stderr, "failed to write to json file");
         return false;
     }
 }

@@ -1,8 +1,8 @@
 #include "utility/Shader.h"
 
 #include <GL/glew.h>
-#include <climits>
-#include <iostream>
+#include <print>
+#include <cstdio>
 #include <string>
 
 Shader::Shader(unsigned int vertexID, unsigned int fragmentID):
@@ -12,7 +12,7 @@ m_fragmentID(fragmentID)
     // TODO: how to properly handle an error here.
     if (m_programID = glCreateProgram(); !m_programID)
     {
-        std::cerr << "Error occured creating program" << std::endl;
+        std::println(stderr, "Error occured creating program");
     }
 }
 
@@ -72,8 +72,7 @@ void Shader::CreateShader()
         message.reserve(loglength);
         glGetShaderInfoLog(m_programID, loglength, &loglength, message.data());
 
-        std::cerr << "Program failed to link/validate:\n\n"
-                  << message << std::endl;
+        std::println(stderr, "Program failed to link/validate:\n\n{}", message);
     }
 }
 
@@ -96,7 +95,7 @@ void Shader::SetUniform1i(const std::string& name, int value)
 {
     int var_location{GetUniformLocation(name)};
     if (var_location <= -1)
-        std::cerr << "SetUniform1i: Variable "<< name <<" Location Not Found" << std::endl;
+        std:println(stderr, "SetUniform1i: Variable {} Location Not Found", name);
 
     glUniform1i(var_location, value);
 }
@@ -105,7 +104,7 @@ void Shader::SetUniform1iv(const std::string& name, int count, int* value)
 {
     int var_location{GetUniformLocation(name)};
     if (var_location <= -1)
-        std::cerr << "SetUniform1iv: Variable "<< name <<" Location Not Found" << std::endl;
+        std::println(stderr, "SetUniform1iv: Variable {} Location Not Found", name);
 
     glUniform1iv(var_location, count, value);
 }
@@ -114,7 +113,7 @@ void Shader::SetUniform1f(const std::string& name, float value)
 {
     int var_location{GetUniformLocation(name)};
     if (var_location <= -1)
-        std::cerr << "SetUniform1f: Variable "<< name <<" Location Not Found" << std::endl;
+        std::println(stderr, "SetUniform1f: Variable {} Location Not Found", name);
 
     glUniform1f(var_location, value);
 }
@@ -127,7 +126,7 @@ void Shader::SetUniform3fv(const std::string& name, const int count, const GLflo
 {
     int var_location{GetUniformLocation(name)};
     if (var_location <= -1)
-        std::cerr << "SetUniform3fv: Variable "<< name <<" Location Not Found" << std::endl;
+        std::println(stderr, "SetUniform3fv: Variable {} Location Not Found", name);
 
     glUniform3fv(var_location, count, value);
 }
@@ -136,7 +135,7 @@ void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2,
 {
     int var_location{GetUniformLocation(name)};
     if (var_location <= -1)
-        std::cerr << "SetUniform4f: Variable "<< name <<" Location Not Found" << std::endl;
+        std::println(stderr, "SetUniform4f: Variable {} Location Not Found", name);
 
     glUniform4f(var_location, v0, v1, v2, v3);
 }
@@ -145,7 +144,7 @@ void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
 {
     int var_location{GetUniformLocation(name)};
     if (var_location <= -1)
-        std::cerr << "SetUniformMat4f: Variable "<< name <<" Location Not Found" << std::endl;
+        std::println(stderr, "SetUniformMat4f: Variable {} Location Not Found", name);
 
     glUniformMatrix4fv(var_location, 1, GL_FALSE, &matrix[0][0]);
 }

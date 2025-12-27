@@ -5,8 +5,8 @@
 #include <array>
 #include <cassert>
 #include <filesystem>
-#include <iostream>
-#include <format>
+#include <print>
+#include <cstdio>
 #include <stb/stb_image.h>
 #include <system_error>
 
@@ -28,7 +28,7 @@ void Window::Create()
     m_handle = glfwCreateWindow(m_specification.width, m_specification.height, m_specification.title.c_str(), nullptr, nullptr);
     if (!m_handle)
     {
-        std::cerr << "Window failed to Create" << std::endl;
+        std::println(stderr, "Window failed to Create");
         assert(false);
     }
 
@@ -95,7 +95,7 @@ void Window::SetWindowIcon()
     {
         if (!std::filesystem::exists(file, ec))
         {
-            std::cerr << "Image does not exist: " << ec.message() << std::endl;
+            std::println(stderr, "Image does not exist: {}", ec.message());
             return;
         }
     }
@@ -112,7 +112,7 @@ void Window::SetWindowIcon()
 
     if (!data64 || !data32 || !data16)
     {
-        std::cerr << "Failed to load icon image." << std::endl;
+        std::println(stderr, "Failed to load icon image.");
         return;
     }
 
@@ -163,7 +163,7 @@ void Window::ProcessMousePressCallback(int button, int action, int mods)
 {
     if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_LEFT)
     {
-        std::cout << std::format("Mouse button pressed: x {}, y: {}\n", m_lastMouseX, m_lastMouseY);
+        std::println("Mouse button pressed: x {}, y: {}", m_lastMouseX, m_lastMouseY);
     }
 }
 
@@ -207,6 +207,6 @@ void Window::ProcessMouseScrollCallback(double xPosIn, double yPosIn)
         m_zoomFactor = 0.5f;
     }
 
-    std::cout << std::format("zoom: {}, delta: {} ", m_zoomFactor, yPosIn * 0.1f) << std::endl;
+    std::println("zoom: {}, delta: {} ", m_zoomFactor, yPosIn * 0.1f);
 }
 }// namespace Core

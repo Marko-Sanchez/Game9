@@ -1,7 +1,7 @@
 #include "scene/Game.h"
 
-#include <format>
-#include <iostream>
+#include <print>
+#include <cstdio>
 
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
@@ -13,7 +13,7 @@ namespace Core
  */
 static void GLFWErrorCallback(int error, const char* description)
 {
-    std::cerr << std::format("[GLFW Error {}]: {}", error, description) << std::endl;
+    std::println(stderr, "[GLFW Error {}]: {}", error, description);
 }
 
 Game::Game(const ApplicationSpecification& specification):
@@ -22,7 +22,7 @@ m_specification(specification)
     glfwSetErrorCallback(GLFWErrorCallback);
     if (!glfwInit())
     {
-        std::cerr << "Failed to intialize GLFW." << std::endl;
+        std::println("Failed to intialize GLFW.");
         std::exit(EXIT_FAILURE);
     }
 
@@ -38,9 +38,7 @@ m_specification(specification)
     // OpenGL configuration.
     if (GLenum err = glewInit(); err != GLEW_OK)
     {
-        std::cerr << std::format("Failed to Initialize GLEW\n\
-                Needs a valid OpenGL Context: Window::Create()?\n\
-                Error: {}", reinterpret_cast<const char *>(glewGetErrorString(err)));
+        std::println(stderr, "Failed to Initialize GLEW need a valid OpenGL Context:\nError: {}", reinterpret_cast<const char *>(glewGetErrorString(err)));
     }
 
     glEnable(GL_BLEND);

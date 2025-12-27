@@ -1,9 +1,9 @@
 #include "utility/ResourceManager.h"
 
-
 #include <stb/stb_image.h>
 
-#include <iostream>
+#include <print>
+#include <cstdio>
 
 #include <fstream>
 #include <filesystem>
@@ -56,12 +56,12 @@ std::shared_ptr<Shader> ResourceManager::LoadShader(const std::string_view verte
     std::error_code ec;
     if (!std::filesystem::exists(vertexPath, ec) || !std::filesystem::exists(fragmentPath, ec))
     {
-        std::cerr << "Shader path not found:\n" << ec.message() << std::endl;
+        std::println(stderr, "Shader path not found: {}", ec.message());
         return nullptr;
     }
     else if (auto shaderIter = m_shader.find(shaderName); shaderIter != m_shader.end())
     {
-        std::cerr << "Shader already exist with this name: " << shaderName << std::endl;
+        std::println(stderr, "Shader already exist with this name: {}", shaderName);
         return nullptr;
     }
 
@@ -99,13 +99,13 @@ std::shared_ptr<Texture2D> ResourceManager::LoadTexture(const std::string_view t
     std::error_code ec;
     if (!std::filesystem::exists(texturePath, ec))
     {
-        std::cerr << "Texture path not found:\n" << ec.message() << std::endl;
+        std::println(stderr, "Texture path not found: {}", ec.message());
         return nullptr;
     }
 
     if (auto iter = m_textures.find(textureName); iter != m_textures.end())
     {
-        std::cerr << "Texture already exist with this name: " << textureName << std::endl;
+        std::println(stderr, "Texture already exist with this name: {}", textureName);
         return nullptr;
     }
 
@@ -150,7 +150,7 @@ std::shared_ptr<unsigned char> ResourceManager::LoadImage(const std::string_view
     std::error_code ec;
     if (!std::filesystem::exists(path, ec))
     {
-        std::cerr << "Path not found:\n" << ec.message() << std::endl;
+        std::println(stderr, "Path not found: {}", ec.message());
         return nullptr;
     }
 
@@ -165,7 +165,7 @@ std::string ResourceManager::ParseShaderFile(const std::string_view& filepath)
     std::ifstream ifs(filepath.data());
     if (!ifs.is_open())
     {
-        std::cerr << "Failed to Open file: " << filepath << std::endl;
+        std::println(stderr,  "Failed to Open file: {}", filepath);
         return "";
     }
 
@@ -211,9 +211,7 @@ unsigned int ResourceManager::CompileShader(unsigned int type, const std::string
         message.reserve(length);
         glGetShaderInfoLog(id, length, &length, message.data());
 
-        std::cerr << "Failed to Compile "
-            << (type == GL_VERTEX_SHADER ? "vertex" : "fragment")
-            << " shader\n" << message << std::endl;
+        std::println(stderr, "Failed to compile {} shader: {}", (type == GL_VERTEX_SHADER ? "vertex" : "fragment"), message);
 
         glDeleteShader(id);
         return 0;

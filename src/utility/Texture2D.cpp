@@ -3,7 +3,8 @@
 #include <GL/gl.h>
 #include <stb/stb_image.h>
 
-#include <iostream>
+#include <print>
+#include <cstdio>
 #include <memory>
 
 /* Constructor */
@@ -76,6 +77,6 @@ void Texture2D::GenerateTexture(const std::string_view& texturePath, int texture
     }
     else
     {
-        std::cerr << "Failed to load Texture\n" << stbi_failure_reason() << std::endl;
+        std::println(stderr, "Failed to load Texture: {}", stbi_failure_reason());
     }
 }

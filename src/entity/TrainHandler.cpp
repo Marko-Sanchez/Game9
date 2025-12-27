@@ -1,5 +1,5 @@
 #include "entity/TrainHandler.h"
-#include <iostream>
+#include <print>
 
 namespace Game9
 {
@@ -113,8 +113,8 @@ void TrainHandler::LoadPaths()
     m_jsonHandler.Read();
     for (const auto& train: m_jsonHandler.m_jsonData["trains"])
     {
-        std::cout << "-----------ITEM----------------" << std::endl;
-        std::cout << std::setw(4) << train << std::endl;
+        std::println("-----------ITEM----------------");
+        std::println("{}", train.dump(4));
 
         std::vector<glm::vec2> path = train["path"];
         std::string objectName = train["name"].template get<std::string>();
@@ -149,7 +149,7 @@ void TrainHandler::AddTrain(const std::string& name, std::string_view trainName,
     };
 
     m_jsonHandler.m_jsonData["trains"].emplace_back(train);
-    std::cout << std::setw(4) << m_jsonHandler.m_jsonData << std::endl;
+    std::println("{}", m_jsonHandler.m_jsonData.dump(4));
 
     m_trains.try_emplace(name, m_resourceManager.GetTexture(trainName), glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), glm::vec2(64, 64), glm::vec2(50, 50));
 }
