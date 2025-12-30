@@ -21,11 +21,11 @@ namespace Core::model
 class SpriteRenderer
 {
 private:
-    std::shared_ptr<Shader> m_shader;
+    std::shared_ptr<Core::util::Shader> m_shader;
     unsigned int m_vao;
 
 public:
-    SpriteRenderer(std::shared_ptr<Shader> shader);
+    SpriteRenderer(std::shared_ptr<Core::util::Shader> shader);
     ~SpriteRenderer();
 
     void DrawSprite(std::shared_ptr<Texture2D> texture, glm::vec2 position = glm::vec2(0.0f), glm::vec2 size = glm::vec2(10.0f, 10.0f), float rotate = 0.0f);

@@ -32,7 +32,7 @@ private:
     std::shared_ptr<Texture2D> m_texture;
 
 public:
-    SceneHandler(std::shared_ptr<Shader> sceneshader, std::shared_ptr<Core::Window> window, std::shared_ptr<Texture2D> texture);
+    SceneHandler(std::shared_ptr<Core::util::Shader> sceneshader, std::shared_ptr<Core::Window> window, std::shared_ptr<Texture2D> texture);
 
     void Draw();
     void UpdateModel(const Core::model::Transform& model);

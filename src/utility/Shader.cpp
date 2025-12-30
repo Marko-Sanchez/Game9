@@ -3,22 +3,49 @@
 #include <GL/glew.h>
 #include <print>
 #include <cstdio>
+#include <stdexcept>
 #include <string>
 
+namespace Core::util
+{
+/*
+ * Attach vertex and fragment to m_programID. Shader deletion is handled by
+ * ShaderFileHandler in ResourceManager class.
+ */
 Shader::Shader(unsigned int vertexID, unsigned int fragmentID):
 m_vertexID(vertexID),
 m_fragmentID(fragmentID)
 {
-    // TODO: how to properly handle an error here.
     if (m_programID = glCreateProgram(); !m_programID)
     {
-        std::println(stderr, "Error occured creating program");
+        throw std::runtime_error("glCreateProgram failed.");
+    }
+
+    glAttachShader(m_programID, m_vertexID);
+    glAttachShader(m_programID, m_fragmentID);
+    glLinkProgram(m_programID);
+
+    glValidateProgram(m_programID);
+
+    int linkStatus;
+    glGetProgramiv(m_programID, GL_LINK_STATUS, &linkStatus);
+    if (linkStatus == GL_FALSE)
+    {
+        char log[1024] = {};
+        int loglength{};
+
+        glGetProgramInfoLog(m_programID, 1024, &loglength, log);
+
+        throw std::runtime_error(std::string{"Program failed to link/validate: "} + log);
     }
 }
 
 Shader::~Shader()
 {
-    glDeleteProgram(m_programID);
+    if (m_programID != 0)
+    {
+        glDeleteProgram(m_programID);
+    }
 }
 
 /*
@@ -46,34 +73,6 @@ void Shader::Bind() const
 void Shader::UnBind() const
 {
     glUseProgram(0);
-}
-
-/*
- * Attach vertex and fragment to m_programID. Shader deletion is handled by
- * ShaderFileHandler in ResourceManager class.
- */
-void Shader::CreateShader()
-{
-    glAttachShader(m_programID, m_vertexID);
-    glAttachShader(m_programID, m_fragmentID);
-    glLinkProgram(m_programID);
-    glValidateProgram(m_programID);
-
-    int linkresult, validateresult;
-    glGetProgramiv(m_programID, GL_LINK_STATUS, &linkresult);
-    glGetProgramiv(m_programID, GL_VALIDATE_STATUS, &validateresult);// debugging, heavy cost.
-    if (linkresult == GL_FALSE || validateresult == GL_FALSE)
-    {
-        int loglength;
-        std::string message;
-
-        glGetProgramiv(m_programID, GL_INFO_LOG_LENGTH, &loglength);
-
-        message.reserve(loglength);
-        glGetShaderInfoLog(m_programID, loglength, &loglength, message.data());
-
-        std::println(stderr, "Program failed to link/validate:\n\n{}", message);
-    }
 }
 
 // looks up uniform in cache, if not found does a expensive glGetUniformLocation() look up.
@@ -148,3 +147,4 @@ void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
 
     glUniformMatrix4fv(var_location, 1, GL_FALSE, &matrix[0][0]);
 }
+}// namespace Core::util

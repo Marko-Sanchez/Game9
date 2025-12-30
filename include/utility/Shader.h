@@ -6,6 +6,8 @@
 #include <string>
 #include <unordered_map>
 
+namespace Core::util
+{
 // Shaders are software that run on the GPU, this class takes
 // two types of shaders Vertex shader (runs once per vertex) and
 // Fragment shader (runs per pixel). This class parses, and compiles the
@@ -37,8 +39,6 @@ public:
     void Bind() const;
     void UnBind() const;
 
-    void CreateShader();
-
     // Set the value of a uniform in current shader.
     void SetUniform1i(const std::string& name, int value);
     void SetUniform1iv(const std::string& name, int count, int* value);
@@ -49,4 +49,5 @@ public:
 
     int GetUniformLocation(const std::string& name);
 };
+}// namespace Core::util
 #endif

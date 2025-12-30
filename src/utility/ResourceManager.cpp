@@ -1,5 +1,6 @@
 #include "utility/ResourceManager.h"
 
+#include <exception>
 #include <stb/stb_image.h>
 
 #include <print>
@@ -65,29 +66,29 @@ std::shared_ptr<Shader> ResourceManager::LoadShader(const std::string_view verte
         return nullptr;
     }
 
-    auto vertexIter   = m_files.find(vertexPath);
-    auto fragmentIter = m_files.find(fragmentPath);
+    auto &v = m_files.try_emplace(
+            std::string{vertexPath},
+            CompileShader(GL_VERTEX_SHADER, ParseShaderFile(vertexPath))
+            ).first->second;
 
-    if (vertexIter ==  m_files.end())
+    auto &f = m_files.try_emplace(
+            std::string{fragmentPath},
+            CompileShader(GL_FRAGMENT_SHADER, ParseShaderFile(fragmentPath))
+            ).first->second;
+
+    try
     {
-        std::string contents{ParseShaderFile(vertexPath)};
-        vertexIter = m_files.emplace(vertexPath, CompileShader(GL_VERTEX_SHADER, contents)).first;
+        // Create Shader.
+        auto shader = std::make_shared<Shader>(v.ID, f.ID);
+        m_shader.emplace(std::string{shaderName}, shader);
+
+        return shader;
     }
-    if (fragmentIter == m_files.end())
+    catch (const std::exception& e)
     {
-        std::string contents{ParseShaderFile(fragmentPath)};
-        fragmentIter = m_files.emplace(fragmentPath, CompileShader(GL_FRAGMENT_SHADER, contents)).first;
+        std::println(stderr, "Failed to create shader '{}': {}", shaderName, e.what());
+        return nullptr;
     }
-
-    auto vID = vertexIter->second.ID;
-    auto fID = fragmentIter->second.ID;
-
-    // Create Shader.
-    auto shader = std::make_shared<Shader>(vID, fID);
-    shader->CreateShader();
-
-    m_shader.emplace(std::string{shaderName}, shader);
-    return shader;
 }
 
 // should resource manager simply handle the loading of textures and loading of shaders->enum.

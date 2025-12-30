@@ -7,7 +7,7 @@
 namespace Core::model
 {
 /* Constructor */
-SpriteRenderer::SpriteRenderer(std::shared_ptr<Shader> shader):
+SpriteRenderer::SpriteRenderer(std::shared_ptr<Core::util::Shader> shader):
 m_shader(shader)
 {
     initRenderData();
