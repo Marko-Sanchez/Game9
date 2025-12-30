@@ -25,7 +25,7 @@ m_window(window)
     m_resourceManager.GetShader(idName)->SetUniform1i("u_image", 0);
     m_resourceManager.GetShader(idName)->SetUniformMat4f("u_projection", projection);
 
-    m_background = std::make_unique<Game9::SceneHandler>(m_resourceManager.GetShader(idName),
+    m_background = std::make_unique<SceneHandler>(m_resourceManager.GetShader(idName),
                                                          m_window,
                                                          m_resourceManager.LoadTexture(backgroundTexture, idName, 0));
 }

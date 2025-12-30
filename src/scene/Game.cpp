@@ -107,7 +107,10 @@ void Game::ProcessInput(float deltaTime)
     m_window->Tick(deltaTime);
 }
 
-std::shared_ptr<Window> Game::GetWindow()
+/*
+ * Used to provide access to Window management class when pushing layers onto stack.
+ */
+std::shared_ptr<Window> Game::GetWindow() noexcept
 {
     return m_window;
 }

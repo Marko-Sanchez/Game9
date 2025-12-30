@@ -4,6 +4,8 @@
 #include "glm/ext/matrix_transform.hpp"
 #include <GL/gl.h>
 
+namespace Core::model
+{
 /* Constructor */
 SpriteRenderer::SpriteRenderer(std::shared_ptr<Shader> shader):
 m_shader(shader)
@@ -53,7 +55,7 @@ void SpriteRenderer::DrawSprite(std::shared_ptr<Texture2D> texture, glm::vec2 po
     this->Draw();
 }
 
-void SpriteRenderer::DrawSprite(std::shared_ptr<Texture2D> texture, Game9::Transform transform)
+void SpriteRenderer::DrawSprite(std::shared_ptr<Texture2D> texture, Transform transform)
 {
     m_shader->Bind();
 
@@ -119,3 +121,4 @@ void SpriteRenderer::Draw()
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 }
+}// namespace Core::model

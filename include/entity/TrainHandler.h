@@ -64,7 +64,7 @@ public:
     TrainHandler();
     ~TrainHandler();
 
-    void Draw(std::shared_ptr<SpriteRenderer> rend);
+    void Draw(std::shared_ptr<Core::model::SpriteRenderer> rend);
     void Update(float deltaTime);
     void LoadPaths();
     void AddTrain(const std::string& name, std::string_view trainName, const std::vector<glm::vec2>& path);

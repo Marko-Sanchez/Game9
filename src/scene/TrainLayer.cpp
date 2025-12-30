@@ -22,7 +22,7 @@ m_window(window)
 
     // TrainHandler loads train textures and paths; EntityRenderer draws the trains.
     m_trainHandler = std::make_unique<Game9::TrainHandler>();
-    m_entityRenderer = std::make_unique<SpriteRenderer>(m_resourceManager.GetShader("train"));
+    m_entityRenderer = std::make_unique<Core::model::SpriteRenderer>(m_resourceManager.GetShader("train"));
 
     // loads all game assest.
     m_trainHandler->LoadPaths();

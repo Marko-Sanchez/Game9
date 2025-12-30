@@ -1,7 +1,7 @@
 #include "utility/Transform.h"
 #include "glm/ext/matrix_transform.hpp"
 
-namespace Game9
+namespace Core::model
 {
 Transform::Transform()
 {
@@ -43,4 +43,4 @@ void Transform::SetParentMatrix(const glm::mat4& parentMatrix)
 {
     m_parentMatrix = parentMatrix;
 }
-}
+}// namespace Core::model

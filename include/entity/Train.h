@@ -43,7 +43,7 @@ public:
     Train(std::shared_ptr<Texture2D> texture, glm::vec2 pos, glm::vec2 size, glm::vec2 velocity);
     virtual ~Train();
 
-    virtual void Draw(std::shared_ptr<SpriteRenderer> rend);
+    virtual void Draw(std::shared_ptr<Core::model::SpriteRenderer> rend);
     virtual void Travel(float deltaTime);
 
     virtual void SetPath(const std::vector<glm::vec2>& path);

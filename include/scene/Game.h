@@ -42,7 +42,7 @@ public:
     void Update(float deltaTime);
 
     // Share window specification with layers.
-    std::shared_ptr<Window> GetWindow();
+    std::shared_ptr<Window> GetWindow() noexcept;
 
     template<typename TLayer, typename ...Args>
     requires(std::derived_from<TLayer, Layer>)

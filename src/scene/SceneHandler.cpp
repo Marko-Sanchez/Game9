@@ -6,18 +6,21 @@ SceneHandler::SceneHandler(std::shared_ptr<Shader> sceneshader, std::shared_ptr<
 m_window(window),
 m_texture(texture)
 {
-    m_renderer = std::make_unique<SpriteRenderer>(sceneshader);
+    m_renderer = std::make_unique<Core::model::SpriteRenderer>(sceneshader);
 
     auto windowspec = m_window->GetWindowSpecification();
     m_model.m_scale = glm::vec2(static_cast<float>(windowspec.width * 2), static_cast<float>(windowspec.height * 2));
 }
 
+/*
+ * Draws sprite, providing MVP values.
+ */
 void SceneHandler::Draw()
 {
     m_renderer->DrawSprite(m_texture, m_model.m_position, m_model.m_scale, m_model.m_rotation);
 }
 
-void SceneHandler::UpdateModel(const Transform& model)
+void SceneHandler::UpdateModel(const Core::model::Transform& model)
 {
     m_model = model;
 }

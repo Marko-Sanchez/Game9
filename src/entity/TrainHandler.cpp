@@ -81,7 +81,7 @@ TrainHandler::~TrainHandler()
 /*
  * Iterates m_trains and calls draw function of train class object.
  */
-void TrainHandler::Draw(std::shared_ptr<SpriteRenderer> rend)
+void TrainHandler::Draw(std::shared_ptr<Core::model::SpriteRenderer> rend)
 {
     for (auto& [name, train]: m_trains)
     {

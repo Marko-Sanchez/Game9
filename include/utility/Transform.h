@@ -2,11 +2,14 @@
 #define TRANSFORM_H
 
 #include "glm/ext/vector_float2.hpp"
-#include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 
-namespace Game9
+namespace Core::model
 {
+/*
+ * Calculates the Model-View-Projection determining how model / object / sprite
+ * is drawn.
+ */
 class Transform
 {
 public:
@@ -27,5 +30,5 @@ public:
 
     void SetParentMatrix(const glm::mat4& parentGlobalMatrix);
 };
-}
+}// namespace Core::model
 #endif
