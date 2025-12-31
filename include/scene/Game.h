@@ -33,10 +33,9 @@ public:
     Game(const ApplicationSpecification& specification = ApplicationSpecification());
     ~Game();
 
+    // main game loop.
     void Run();
-    // intialize game state (load all shaders/textures).
-    void Init();
-    // Game loop.
+
     void Render();
     void ProcessInput(float deltaTime);
     void Update(float deltaTime);
