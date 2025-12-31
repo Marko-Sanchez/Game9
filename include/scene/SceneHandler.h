@@ -29,10 +29,10 @@ private:
     std::unique_ptr<Core::model::SpriteRenderer> m_renderer;
 
     std::shared_ptr<Core::Window> m_window;
-    std::shared_ptr<Texture2D> m_texture;
+    std::shared_ptr<Core::util::Texture2D> m_texture;
 
 public:
-    SceneHandler(std::shared_ptr<Core::util::Shader> sceneshader, std::shared_ptr<Core::Window> window, std::shared_ptr<Texture2D> texture);
+    SceneHandler(std::shared_ptr<Core::util::Shader> sceneshader, std::shared_ptr<Core::Window> window, std::shared_ptr<Core::util::Texture2D> texture);
 
     void Draw();
     void UpdateModel(const Core::model::Transform& model);

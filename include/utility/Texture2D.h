@@ -1,8 +1,10 @@
 #ifndef TEXTURE2D_H
 #define TEXTURE2D_H
 
-#include <string_view>
+#include <filesystem>
 
+namespace Core::util
+{
 /*
 * Generates a 2D Texture using third-party vendor STBI to load
 * image data.
@@ -29,7 +31,7 @@ public:
     unsigned int m_filterMin;
     unsigned int m_filterMax;
 
-    Texture2D();
+    Texture2D(const std::filesystem::path& texturePath, int textureSlot = 0);
     ~Texture2D();
 
     unsigned int GetID() const noexcept;
@@ -37,8 +39,6 @@ public:
 
     void Bind() const;
     void UnBind() const;
-
-    void GenerateTexture(const std::string_view& texturePath, int textureSlot = 0);
 };
-
+}
 #endif

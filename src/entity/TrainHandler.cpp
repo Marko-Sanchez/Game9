@@ -1,4 +1,5 @@
 #include "entity/TrainHandler.h"
+#include <filesystem>
 #include <print>
 
 namespace Game9
@@ -67,9 +68,10 @@ m_jsonHandler("resources/gamedata/traindata.json")
         auto [trainName, trainType] = parsefilename(m_texturePaths[i]);
         if (!trainName.empty() && !trainType.empty())
         {
+            std::filesystem::path p(m_texturePaths[i]);
             m_trainIdentifier[trainName] = toTrainType(trainType);
             // TODO: in the future all trains will be in a single texture file.
-            m_resourceManager.LoadTexture(m_texturePaths[i], trainName, i + 1);
+            m_resourceManager.LoadTexture(std::filesystem::absolute(p), trainName, i + 1);
         }
     }
 }

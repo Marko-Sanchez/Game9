@@ -2,7 +2,7 @@
 
 namespace Game9
 {
-SceneHandler::SceneHandler(std::shared_ptr<Core::util::Shader> sceneshader, std::shared_ptr<Core::Window> window, std::shared_ptr<Texture2D> texture):
+SceneHandler::SceneHandler(std::shared_ptr<Core::util::Shader> sceneshader, std::shared_ptr<Core::Window> window, std::shared_ptr<Core::util::Texture2D> texture):
 m_window(window),
 m_texture(texture)
 {

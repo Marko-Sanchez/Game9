@@ -1,11 +1,11 @@
 #ifndef TRAIN_H
 #define TRAIN_H
 
-#include <memory>
-
 #include "utility/SpriteRenderer.h"
 #include "utility/Texture2D.h"
 #include <glm/glm.hpp>
+
+#include <memory>
 
 namespace Game9
 {
@@ -22,7 +22,7 @@ private:
     enum Direction m_direction;
 
     // Train Texture.
-    std::shared_ptr<Texture2D> m_sprite;
+    std::shared_ptr<Core::util::Texture2D> m_sprite;
 
     // Train Model data.
     glm::vec2 m_position;
@@ -40,7 +40,7 @@ private:
 
 public:
     Train();
-    Train(std::shared_ptr<Texture2D> texture, glm::vec2 pos, glm::vec2 size, glm::vec2 velocity);
+    Train(std::shared_ptr<Core::util::Texture2D> texture, glm::vec2 pos, glm::vec2 size, glm::vec2 velocity);
     virtual ~Train();
 
     virtual void Draw(std::shared_ptr<Core::model::SpriteRenderer> rend);

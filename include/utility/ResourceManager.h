@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <functional>
+#include <filesystem>
 #include <string>
 #include <map>
 
@@ -44,7 +45,7 @@ public:
     std::shared_ptr<Shader> LoadShader(const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view shaderName);
     std::shared_ptr<Shader> GetShader(const std::string_view shaderName);
 
-    std::shared_ptr<Texture2D> LoadTexture(const std::string_view texturePath, const std::string_view textureName, const int textureSlot);
+    std::shared_ptr<Texture2D> LoadTexture(const std::filesystem::path& texturePath, const std::string_view textureName, const int textureSlot);
     std::shared_ptr<Texture2D> GetTexture(const std::string_view textureName);
 
     std::shared_ptr<unsigned char> LoadImage(const std::string_view path, int& width, int& height);

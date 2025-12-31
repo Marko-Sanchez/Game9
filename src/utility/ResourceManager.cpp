@@ -91,11 +91,15 @@ std::shared_ptr<Shader> ResourceManager::LoadShader(const std::string_view verte
     }
 }
 
-// should resource manager simply handle the loading of textures and loading of shaders->enum.
-
-// TODO: Figure file paths, in the case were user does not call executable from source directory.
-// whatever object handles the texture should deal with the texture-name
-std::shared_ptr<Texture2D> ResourceManager::LoadTexture(const std::string_view texturePath, const std::string_view textureName, const int textureSlot)
+/*
+ * Creates a texture allowing shader to read texture data.
+ *
+ * @params:
+ * texturePath: absolute path to 2D texture (in this case .png file).
+ * textureName: unique name to allow identifying texture.
+ * textureSlot: int value representing which slot texture unit it to be made active for drawing / manipulating.
+ */
+std::shared_ptr<Texture2D> ResourceManager::LoadTexture(const std::filesystem::path& texturePath, const std::string_view textureName, const int textureSlot)
 {
     std::error_code ec;
     if (!std::filesystem::exists(texturePath, ec))
@@ -110,11 +114,18 @@ std::shared_ptr<Texture2D> ResourceManager::LoadTexture(const std::string_view t
         return nullptr;
     }
 
-    auto texture = std::make_shared<Texture2D>();
-    texture->GenerateTexture(texturePath, textureSlot);
-    m_textures.emplace(std::string{textureName}, texture);
+    try
+    {
+        auto texture = std::make_shared<Texture2D>(texturePath, textureSlot);
+        m_textures.emplace(std::string{textureName}, texture);
 
-    return texture;
+        return texture;
+    }
+    catch (const std::exception& e)
+    {
+        std::println(stderr, "Failed to create texture '{}': {}", textureName, e.what());
+        return nullptr;
+    }
 }
 
 std::shared_ptr<Shader> ResourceManager::GetShader(const std::string_view shaderName)

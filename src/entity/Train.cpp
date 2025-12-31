@@ -8,7 +8,7 @@ Train::Train():
 m_direction(Direction::FORWARD), m_sprite(nullptr), m_position(4.0f, 4.0f), m_size(256.0f, 256.0f), m_velocity(0.0f, 0.0f), m_rotation(0.0f), m_segmentProgess(0.0f), m_currentSegment(0)
 {}
 
-Train::Train(std::shared_ptr<Texture2D> texture, glm::vec2 pos, glm::vec2 size, glm::vec2 velocity):
+Train::Train(std::shared_ptr<Core::util::Texture2D> texture, glm::vec2 pos, glm::vec2 size, glm::vec2 velocity):
 m_direction(Direction::FORWARD), m_sprite(texture), m_position(pos), m_size(size), m_velocity(velocity), m_rotation(0.0f), m_segmentProgess(0.0f), m_currentSegment(0)
 {}
 

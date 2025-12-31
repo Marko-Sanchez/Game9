@@ -31,7 +31,7 @@ SpriteRenderer::~SpriteRenderer()
  * size: increase or decrease texture.
  * rotate: rotate texture.
  */
-void SpriteRenderer::DrawSprite(std::shared_ptr<Texture2D> texture, glm::vec2 position, glm::vec2 size, float rotate)
+void SpriteRenderer::DrawSprite(std::shared_ptr<Core::util::Texture2D> texture, glm::vec2 position, glm::vec2 size, float rotate)
 {
     m_shader->Bind();
 
@@ -55,7 +55,7 @@ void SpriteRenderer::DrawSprite(std::shared_ptr<Texture2D> texture, glm::vec2 po
     this->Draw();
 }
 
-void SpriteRenderer::DrawSprite(std::shared_ptr<Texture2D> texture, Transform transform)
+void SpriteRenderer::DrawSprite(std::shared_ptr<Core::util::Texture2D> texture, Transform transform)
 {
     m_shader->Bind();
 
