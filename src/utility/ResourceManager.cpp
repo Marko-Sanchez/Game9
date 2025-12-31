@@ -8,6 +8,7 @@
 
 #include <fstream>
 #include <filesystem>
+#include <stdexcept>
 #include <string_view>
 #include <system_error>
 
@@ -52,10 +53,9 @@ ResourceManager::ShaderFileHandler& ResourceManager::ShaderFileHandler::operator
  * Parses and compiles vertex and fragment shader files. If shader path already exist,
  * create a new shader and attach the already created shader id to a new program.
 */
-std::shared_ptr<Shader> ResourceManager::LoadShader(const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view shaderName)
+std::shared_ptr<Shader> ResourceManager::LoadShader(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath, const std::string_view shaderName)
 {
-    std::error_code ec;
-    if (!std::filesystem::exists(vertexPath, ec) || !std::filesystem::exists(fragmentPath, ec))
+    if (std::error_code ec; !std::filesystem::exists(vertexPath, ec) || !std::filesystem::exists(fragmentPath, ec))
     {
         std::println(stderr, "Shader path not found: {}", ec.message());
         return nullptr;
@@ -66,18 +66,18 @@ std::shared_ptr<Shader> ResourceManager::LoadShader(const std::string_view verte
         return nullptr;
     }
 
-    auto &v = m_files.try_emplace(
-            std::string{vertexPath},
-            CompileShader(GL_VERTEX_SHADER, ParseShaderFile(vertexPath))
-            ).first->second;
-
-    auto &f = m_files.try_emplace(
-            std::string{fragmentPath},
-            CompileShader(GL_FRAGMENT_SHADER, ParseShaderFile(fragmentPath))
-            ).first->second;
-
     try
     {
+        auto &v = m_files.try_emplace(
+                std::string{vertexPath},
+                CompileShader(GL_VERTEX_SHADER, ParseShaderFile(vertexPath))
+                ).first->second;
+
+        auto &f = m_files.try_emplace(
+                std::string{fragmentPath},
+                CompileShader(GL_FRAGMENT_SHADER, ParseShaderFile(fragmentPath))
+                ).first->second;
+
         // Create Shader.
         auto shader = std::make_shared<Shader>(v.ID, f.ID);
         m_shader.emplace(std::string{shaderName}, shader);
@@ -172,26 +172,28 @@ std::shared_ptr<unsigned char> ResourceManager::LoadImage(const std::string_view
 /*
 * Reads contents from file and returns as a string.
 */
-std::string ResourceManager::ParseShaderFile(const std::string_view& filepath)
+std::string ResourceManager::ParseShaderFile(const std::filesystem::path& filepath)
 {
-    std::ifstream ifs(filepath.data());
-    if (!ifs.is_open())
+    std::ifstream ifs(filepath, std::ios_base::in | std::ios_base::binary);
+    if (!ifs)
     {
-        std::println(stderr,  "Failed to Open file: {}", filepath);
-        return "";
+        throw std::ios_base::failure(std::format("Failed to open file for reading: {}", filepath.string()));
     }
 
-    std::string line;
     std::string contents;
 
     std::error_code ec;
-    if (const auto size{std::filesystem::file_size(filepath, ec)}; !ec)
-        contents.reserve(size);
-
-    while (getline(ifs, line))
+    if (const auto size = std::filesystem::file_size(filepath, ec); !ec)
     {
-        contents.append(line + '\n');
+        contents.reserve(static_cast<size_t>(size));
     }
+
+    std::array<char, 1024> buffer;
+    while (ifs.read(buffer.data(), buffer.size()))
+    {
+        contents.append(buffer.data(), buffer.size());
+    }
+    contents.append(buffer.data(), ifs.gcount());
 
     return contents;
 }
@@ -223,10 +225,9 @@ unsigned int ResourceManager::CompileShader(unsigned int type, const std::string
         message.reserve(length);
         glGetShaderInfoLog(id, length, &length, message.data());
 
-        std::println(stderr, "Failed to compile {} shader: {}", (type == GL_VERTEX_SHADER ? "vertex" : "fragment"), message);
-
         glDeleteShader(id);
-        return 0;
+
+        throw std::runtime_error(std::format("Failed to compile {} shader: {}", (type == GL_VERTEX_SHADER ? "vertex" : "fragment"), message));
     }
 
     return id;
