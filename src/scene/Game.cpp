@@ -1,4 +1,5 @@
 #include "scene/Game.h"
+#include "ui/Event.h"
 
 #include <cassert>
 #include <cstdlib>
@@ -33,6 +34,8 @@ m_specification(specification)
         m_specification.windowspec.title = m_specification.name;
     }
 
+    // set event callable and create window.
+    m_specification.windowspec.EventCallback = [this](Event &event) {this->RaiseEvent(event);};
     m_window = std::make_shared<Window>(m_specification.windowspec);
 
     // OpenGL configuration.

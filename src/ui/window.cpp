@@ -56,10 +56,21 @@ bool Window::ShouldClose()
     return glfwWindowShouldClose(m_handle) != 0;
 }
 
-// Swap Front buffer (currently being displayed) and back buffer (next to render).
+/*
+ * Swap Front buffer (currently being displayed) and back buffer (next to render).
+ */
 void Window::Update()
 {
     glfwSwapBuffers(m_handle);
+}
+
+/*
+ * When an event is invoked, call Game::RaiseEvent() to allow each layer to handle event.
+ */
+void Window::RaiseEvent(Event &event)
+{
+    if (m_specification.EventCallback)
+        m_specification.EventCallback(event);
 }
 
 void Window::Tick(float frameDelta)
@@ -127,6 +138,8 @@ void Window::SetWindowCallbacks()
     glfwSetWindowSizeCallback(m_handle, [](GLFWwindow* window, int width, int height)
     {
         reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessWindowSizeCallback(width, height);
+        // SomeEvent event(width, height);
+        // reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->RaiseEvent(event);
     });
 
     glfwSetKeyCallback(m_handle, [](GLFWwindow* window, int key, int scancode, int action, int mods)

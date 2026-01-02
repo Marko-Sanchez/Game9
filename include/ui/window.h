@@ -1,6 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "ui/Event.h"
 #include <GLFW/glfw3.h>
 #include <string>
 
@@ -12,6 +13,7 @@ struct WindowSpecification
     unsigned int width{1024};
     unsigned int height{1024};
     std::string title;
+    std::function<void(Event&)> EventCallback;
 
     bool isResizeable;
 };
@@ -41,6 +43,7 @@ public:
     bool ShouldClose();
 
     void Update();
+    void RaiseEvent(Event &event);
 
     void Tick(float frameDelta);
 
