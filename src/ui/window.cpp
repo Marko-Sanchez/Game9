@@ -13,23 +13,17 @@
 namespace Core
 {
 
+/*
+ * Create window and set events.
+ */
 Window::Window(const WindowSpecification& specification):
 m_zoomFactor(1.0f),
 m_specification(specification)
-{}
-
-Window::~Window()
-{
-    Destroy();
-}
-
-void Window::Create()
 {
     m_handle = glfwCreateWindow(m_specification.width, m_specification.height, m_specification.title.c_str(), nullptr, nullptr);
     if (!m_handle)
     {
-        std::println(stderr, "Window failed to Create");
-        assert(false);
+        assert(false && "Window failed to create.");
     }
 
     // Necessary to occur after creating Window; Any other version might not work with current code.
@@ -40,6 +34,13 @@ void Window::Create()
     // Make Window Current Context, set swap interval to wait for 1 screen update before swapping buffers.
     glfwMakeContextCurrent(m_handle);
     glfwSwapInterval(1);
+
+    this->SetWindowCallbacks();
+}
+
+Window::~Window()
+{
+    Destroy();
 }
 
 void Window::Destroy()

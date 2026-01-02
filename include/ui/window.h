@@ -37,7 +37,6 @@ public:
     Window(const WindowSpecification& specification);
     ~Window();
 
-    void Create();
     void Destroy();
     bool ShouldClose();
 

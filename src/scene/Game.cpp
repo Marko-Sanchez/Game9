@@ -1,5 +1,7 @@
 #include "scene/Game.h"
 
+#include <cassert>
+#include <cstdlib>
 #include <print>
 #include <cstdio>
 
@@ -22,8 +24,7 @@ m_specification(specification)
     glfwSetErrorCallback(GLFWErrorCallback);
     if (!glfwInit())
     {
-        std::println("Failed to intialize GLFW.");
-        std::exit(EXIT_FAILURE);
+        assert(false && "Failed to intialize GLFW.");
     }
 
     // Set window specification and create the glfw window context.
@@ -33,7 +34,6 @@ m_specification(specification)
     }
 
     m_window = std::make_shared<Window>(m_specification.windowspec);
-    m_window->Create();
 
     // OpenGL configuration.
     if (GLenum err = glewInit(); err != GLEW_OK)
