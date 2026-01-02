@@ -71,9 +71,6 @@ void Game::Run()
         lastFrame = currentFrame;
         glfwPollEvents();
 
-        // manage user input.
-        // this->ProcessInput(deltaTime);
-
         this->Update(deltaTime);
 
         // Clear and Render.
@@ -102,9 +99,22 @@ void Game::Update(float deltaTime)
     }
 }
 
-void Game::ProcessInput(float deltaTime)
+/*
+ * Each layer handles its' own custom method of handling event, cascading until event is handled.
+ *
+ * @param
+ * event: event (mousepressed, keypressed).
+ */
+void Game::RaiseEvent(Event &event)
 {
-    m_window->Tick(deltaTime);
+    for (auto iter = m_layerStack.rbegin(); iter != m_layerStack.rend(); ++iter)
+    {
+        (*iter)->OnEvent(event);
+        if (event.isHandled)
+        {
+            break;
+        }
+    }
 }
 
 /*

@@ -1,6 +1,8 @@
 #ifndef LAYER_H
 #define LAYER_H
 
+#include "ui/Event.h"
+
 #include <concepts>
 #include <memory>
 #include <utility>
@@ -19,7 +21,7 @@ class Layer
     public:
     virtual ~Layer() = default;
 
-    virtual void OnEvent() {}
+    virtual void OnEvent(Event &event) {}
     virtual void OnUpdate(float delta) {}
     virtual void OnRender() {}
 

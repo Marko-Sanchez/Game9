@@ -8,6 +8,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "ui/Event.h"
 #include "ui/Layer.h"
 #include "ui/window.h"
 
@@ -37,8 +38,8 @@ public:
     void Run();
 
     void Render();
-    void ProcessInput(float deltaTime);
     void Update(float deltaTime);
+    void RaiseEvent(Event &event);
 
     // Share window specification with layers.
     std::shared_ptr<Window> GetWindow() noexcept;
