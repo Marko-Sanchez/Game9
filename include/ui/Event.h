@@ -2,6 +2,7 @@
 #define EVENT_H
 
 #include <functional>
+#include <string>
 
 namespace Core
 {
@@ -28,6 +29,7 @@ public:
     virtual ~Event() {}
     virtual EventType GetEventType() const = 0;
     virtual const char* GetName() const = 0;
+    virtual std::string ToString() const { return GetName(); }
 };
 
 // Used within Layer::Event() to handle multiple events.
