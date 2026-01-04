@@ -78,14 +78,28 @@ void Window::Tick(float frameDelta)
     m_frameDelta = frameDelta;
 }
 
-WindowSpecification Window::GetWindowSpecification() const
+float Window::GetZoom() const noexcept
+{
+    return m_zoomFactor;
+}
+
+WindowSpecification Window::GetWindowSpecification() const noexcept
 {
     return m_specification;
 }
 
-float Window::GetZoom() const
+std::pair<int, int> Window::GetFrameBufferSize() const
 {
-    return m_zoomFactor;
+    int width, height;
+    glfwGetFramebufferSize(m_handle, &width, &height);
+    return {width, height};
+}
+
+std::pair<double, double> Window::GetMousePos() const
+{
+    double xpos, ypos;
+    glfwGetCursorPos(m_handle, &xpos, &ypos);
+    return {xpos, ypos};
 }
 
 // Note:

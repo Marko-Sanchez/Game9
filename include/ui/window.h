@@ -31,9 +31,9 @@ private:
     float m_frameDelta;
 
     GLFWwindow* m_handle = nullptr;
-    bool m_firstMouseMovement;
-
     WindowSpecification m_specification;
+
+    bool m_firstMouseMovement;
 
 public:
     Window(const WindowSpecification& specification);
@@ -47,8 +47,10 @@ public:
 
     void Tick(float frameDelta);
 
-    WindowSpecification GetWindowSpecification() const;
-    float GetZoom() const;
+    float GetZoom() const noexcept;
+    WindowSpecification GetWindowSpecification() const noexcept;
+    std::pair<int, int> GetFrameBufferSize() const;
+    std::pair<double, double> GetMousePos() const;
 
 private:
     void SetWindowIcon();
