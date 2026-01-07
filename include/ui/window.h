@@ -57,9 +57,6 @@ private:
 
     void SetWindowCallbacks();
     // callbacks.
-    void ProcessWindowSizeCallback(int width, int height);
-    void ProcessKeyboardCallback(int key, int scancode, int action, int mods);
-    void ProcessMousePressCallback(int button, int action, int mods);
     void ProcessMousePosCallback(double xPosIn, double yPosIn);
     void ProcessMouseScrollCallback(double xPosIn, double yPosIn);
 };

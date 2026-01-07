@@ -8,7 +8,10 @@
 #include <print>
 #include <cstdio>
 #include <stb/stb_image.h>
-#include <system_error>
+
+#include "ui/WindowEvents.h"
+#include "ui/MouseEvents.h"
+#include "ui/KeyEvents.h"
 
 namespace Core
 {
@@ -151,48 +154,69 @@ void Window::SetWindowCallbacks()
 
     glfwSetWindowSizeCallback(m_handle, [](GLFWwindow* window, int width, int height)
     {
-        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessWindowSizeCallback(width, height);
-        // SomeEvent event(width, height);
-        // reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->RaiseEvent(event);
+        WindowResizedEvent event(width, height);
+        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->RaiseEvent(event);
     });
 
-    glfwSetKeyCallback(m_handle, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+    glfwSetWindowCloseCallback(m_handle, [](GLFWwindow* window)
     {
-        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessKeyboardCallback(key, scancode, action, mods);
-    });
-
-    glfwSetMouseButtonCallback(m_handle, [](GLFWwindow* window, int button, int action, int mods)
-    {
-        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessMousePressCallback(button, action, mods);
-    });
-
-    glfwSetCursorPosCallback(m_handle, [](GLFWwindow* window, double xPosIn, double yPosIn)
-    {
-        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessMousePosCallback(xPosIn, yPosIn);
+        WindowClosedEvent event;
+        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->RaiseEvent(event);
     });
 
     glfwSetScrollCallback(m_handle, [](GLFWwindow* window, double xPosIn, double yPosIn)
     {
-        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->ProcessMouseScrollCallback(xPosIn, yPosIn);
+        MousedScrolledEvent event(xPosIn, yPosIn);
+        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->RaiseEvent(event);
     });
-}
 
-void Window::ProcessWindowSizeCallback(int width, int height)
-{
-    m_specification.width  = width;
-    m_specification.height = height;
-}
-
-void Window::ProcessKeyboardCallback(int key, int scancode, int action, int mods)
-{
-}
-
-void Window::ProcessMousePressCallback(int button, int action, int mods)
-{
-    if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_LEFT)
+    glfwSetMouseButtonCallback(m_handle, [](GLFWwindow* window, int button, int action, int mods)
     {
-        std::println("Mouse button pressed: x {}, y: {}", m_lastMouseX, m_lastMouseY);
-    }
+        auto win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+        switch (action)
+        {
+            case GLFW_PRESS:
+            {
+                MouseButtonPressedEvent event(button);
+                win->RaiseEvent(event);
+                break;
+            }
+            case GLFW_RELEASE:
+            {
+                MouseButtonReleasedEvent event(button);
+                win->RaiseEvent(event);
+                break;
+            }
+        }
+    });
+
+    glfwSetKeyCallback(m_handle, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+    {
+        auto win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+        switch (action)
+        {
+            case GLFW_PRESS:
+            case GLFW_REPEAT:
+            {
+                KeyPressedEvent event(key, action == GLFW_REPEAT);
+                win->RaiseEvent(event);
+                break;
+            }
+            case GLFW_RELEASE:
+            {
+                KeyReleasedEvent event(key);
+                win->RaiseEvent(event);
+                break;
+            }
+        }
+    });
+
+    glfwSetCursorPosCallback(m_handle, [](GLFWwindow* window, double xPosIn, double yPosIn)
+    {
+        MouseMovedEvent event(xPosIn, yPosIn);
+        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->RaiseEvent(event);
+    });
+
 }
 
 /*
