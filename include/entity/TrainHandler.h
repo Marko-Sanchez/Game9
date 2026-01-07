@@ -55,7 +55,7 @@ private:
     std::unordered_map<std::string, Train> m_trains;
 
     /* Data loaded from json file containing train data.*/
-    JsonFileHandler m_jsonHandler;
+    Core::util::JsonFileHandler m_jsonHandler;
 
     /* Manage train textures. */
     Core::util::ResourceManager m_resourceManager;

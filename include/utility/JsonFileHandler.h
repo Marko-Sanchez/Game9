@@ -1,9 +1,12 @@
 #ifndef JSON_FILE_HANDLER
 #define JSON_FILE_HANDLER
+
+#include <expected>
+#include <filesystem>
+
 #include <nlohmann/json.hpp>
 #include <glm/glm.hpp>
 
-#include <filesystem>
 namespace glm
 {
     /* Json GLM Adapters.*/
@@ -11,8 +14,11 @@ namespace glm
     void from_json(const nlohmann::json& j, glm::vec2& v);
 }
 
-namespace Game9
+namespace Core::util
 {
+/*
+ * Creates a json object from a json file.
+ */
 struct JsonFileHandler
 {
     std::filesystem::path m_jsonFileName;
@@ -20,10 +26,8 @@ struct JsonFileHandler
 
     JsonFileHandler(const std::filesystem::path& fileName);
 
-    // read from file.
-    bool Read();
-    // write to file.
-    bool Write() const;
+    std::expected<void, std::string> Read();
+    std::expected<void, std::string> Write() const;
 };
 }// namespace Game9
 #endif

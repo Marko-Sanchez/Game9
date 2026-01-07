@@ -112,19 +112,22 @@ void TrainHandler::LoadPaths()
     constexpr int WINDOW_HEIGHT{1024};
 
     // Read file and load json data to member variable.
-    m_jsonHandler.Read();
-    for (const auto& train: m_jsonHandler.m_jsonData["trains"])
+    if (auto ex = m_jsonHandler.Read(); !ex)
     {
-        std::println("-----------ITEM----------------");
-        std::println("{}", train.dump(4));
+        std::println(stderr, "{}", ex.error());
+    }
+    else
+    {
+        for (const auto& train: m_jsonHandler.m_jsonData["trains"])
+        {
+            std::vector<glm::vec2> path = train["path"];
+            std::string objectName = train["name"].template get<std::string>();
+            std::string trainName  = train["trainName"].template get<std::string>();
 
-        std::vector<glm::vec2> path = train["path"];
-        std::string objectName = train["name"].template get<std::string>();
-        std::string trainName  = train["trainName"].template get<std::string>();
-
-        // TODO: getting values for model: initial position, size, and velocity.
-        m_trains.try_emplace(objectName, m_resourceManager.GetTexture(trainName), glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), glm::vec2(64, 64), glm::vec2(50, 50));
-        m_trains[objectName].SetPath(path);
+            // TODO: getting values for model: initial position, size, and velocity.
+            m_trains.try_emplace(objectName, m_resourceManager.GetTexture(trainName), glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), glm::vec2(64, 64), glm::vec2(50, 50));
+            m_trains[objectName].SetPath(path);
+        }
     }
 }
 
