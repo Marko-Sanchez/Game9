@@ -69,12 +69,12 @@ std::shared_ptr<Shader> ResourceManager::LoadShader(const std::filesystem::path&
     try
     {
         auto &v = m_files.try_emplace(
-                std::string{vertexPath},
+                vertexPath.string(),
                 CompileShader(GL_VERTEX_SHADER, ParseShaderFile(vertexPath))
                 ).first->second;
 
         auto &f = m_files.try_emplace(
-                std::string{fragmentPath},
+                fragmentPath.string(),
                 CompileShader(GL_FRAGMENT_SHADER, ParseShaderFile(fragmentPath))
                 ).first->second;
 
