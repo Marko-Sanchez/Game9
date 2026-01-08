@@ -55,9 +55,14 @@ ResourceManager::ShaderFileHandler& ResourceManager::ShaderFileHandler::operator
 */
 std::shared_ptr<Shader> ResourceManager::LoadShader(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath, const std::string_view shaderName)
 {
-    if (std::error_code ec; !std::filesystem::exists(vertexPath, ec) || !std::filesystem::exists(fragmentPath, ec))
+    if (!std::filesystem::exists(vertexPath))
     {
-        std::println(stderr, "Shader path not found: {}", ec.message());
+        std::println(stderr, "Shader path '{}' not found.", vertexPath.string());
+        return nullptr;
+    }
+    else if (!std::filesystem::exists(fragmentPath))
+    {
+        std::println(stderr, "Shader path '{}' not found.", fragmentPath.string());
         return nullptr;
     }
     else if (auto shaderIter = m_shader.find(shaderName); shaderIter != m_shader.end())
@@ -101,10 +106,9 @@ std::shared_ptr<Shader> ResourceManager::LoadShader(const std::filesystem::path&
  */
 std::shared_ptr<Texture2D> ResourceManager::LoadTexture(const std::filesystem::path& texturePath, const std::string_view textureName, const int textureSlot)
 {
-    std::error_code ec;
-    if (!std::filesystem::exists(texturePath, ec))
+    if (!std::filesystem::exists(texturePath))
     {
-        std::println(stderr, "Texture path not found: {}", ec.message());
+        std::println(stderr, "Texture path '{}' not found.", texturePath.string());
         return nullptr;
     }
 
@@ -159,10 +163,9 @@ std::shared_ptr<Texture2D> ResourceManager::GetTexture(const std::string_view te
 */
 std::shared_ptr<unsigned char> ResourceManager::LoadImage(const std::string_view path, int& width, int& height)
 {
-    std::error_code ec;
-    if (!std::filesystem::exists(path, ec))
+    if (!std::filesystem::exists(path))
     {
-        std::println(stderr, "Path not found: {}", ec.message());
+        std::println(stderr, "Image Path '{}' not found.", path);
         return nullptr;
     }
 
