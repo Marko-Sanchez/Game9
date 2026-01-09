@@ -154,8 +154,12 @@ void Window::SetWindowCallbacks()
 
     glfwSetWindowSizeCallback(m_handle, [](GLFWwindow* window, int width, int height)
     {
+        auto win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+        win->m_specification.width = width;
+        win->m_specification.height = height;
+
         WindowResizedEvent event(width, height);
-        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->RaiseEvent(event);
+        win->RaiseEvent(event);
     });
 
     glfwSetWindowCloseCallback(m_handle, [](GLFWwindow* window)
