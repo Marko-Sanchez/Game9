@@ -53,7 +53,8 @@ constexpr std::pair<std::string_view, std::string_view> parsefilename(std::strin
 } // unnamed namespace
 
 /* Constructor.*/
-TrainHandler::TrainHandler():
+TrainHandler::TrainHandler(std::shared_ptr<Core::util::Shader> shader):
+m_sprite(shader),
 m_jsonHandler("resources/gamedata/traindata.json")
 {
     m_texturePaths =
@@ -83,11 +84,11 @@ TrainHandler::~TrainHandler()
 /*
  * Iterates m_trains and calls draw function of train class object.
  */
-void TrainHandler::Draw(std::shared_ptr<Core::model::SpriteRenderer> rend)
+void TrainHandler::Draw()
 {
     for (auto& [name, train]: m_trains)
     {
-        train.Draw(rend);
+        m_sprite.DrawSprite(train.m_texture, train.m_position, train.m_size, train.m_rotation);
     }
 }
 

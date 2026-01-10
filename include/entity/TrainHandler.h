@@ -54,6 +54,8 @@ private:
     /* Train line and train objects.*/
     std::unordered_map<std::string, Train> m_trains;
 
+    Core::model::SpriteRenderer m_sprite;
+
     /* Data loaded from json file containing train data.*/
     Core::util::JsonFileHandler m_jsonHandler;
 
@@ -61,10 +63,10 @@ private:
     Core::util::ResourceManager m_resourceManager;
 
 public:
-    TrainHandler();
+    TrainHandler(std::shared_ptr<Core::util::Shader> shader);
     ~TrainHandler();
 
-    void Draw(std::shared_ptr<Core::model::SpriteRenderer> rend);
+    void Draw();
     void Update(float deltaTime);
     void LoadPaths();
     void AddTrain(const std::string& name, std::string_view trainName, const std::vector<glm::vec2>& path);

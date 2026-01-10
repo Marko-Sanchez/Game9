@@ -22,14 +22,6 @@ Train::~Train()
 {}
 
 /*
- * Draws sprite using shader in SpriteRenderer object.
- */
-void Train::Draw(std::shared_ptr<Core::model::SpriteRenderer> rend)
-{
-    rend->DrawSprite(m_texture, m_position, m_size, m_rotation);
-}
-
-/*
 * Moves the train along a defined path; once either ends are reached, changes direction.
 */
 void Train::Travel(float deltaTime)

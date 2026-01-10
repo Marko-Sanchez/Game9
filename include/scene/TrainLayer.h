@@ -17,11 +17,8 @@ class TrainLayer : public Core::Layer
 {
 private:
     Core::util::ResourceManager m_resourceManager;
-
     std::shared_ptr<Core::Window> m_window;
-
     std::unique_ptr<Game9::TrainHandler> m_trainHandler;
-    std::shared_ptr<Core::model::SpriteRenderer> m_entityRenderer;
 
 public:
     TrainLayer(std::shared_ptr<Core::Window> window);

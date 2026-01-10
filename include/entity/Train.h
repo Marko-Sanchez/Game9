@@ -1,7 +1,6 @@
 #ifndef TRAIN_H
 #define TRAIN_H
 
-#include "utility/SpriteRenderer.h"
 #include "utility/Texture2D.h"
 #include <glm/glm.hpp>
 
@@ -39,11 +38,10 @@ struct Train
 
     Train();
     Train(std::shared_ptr<Core::util::Texture2D> texture, glm::vec2 pos, glm::vec2 size, glm::vec2 velocity);
+
     ~Train();
 
-    virtual void Draw(std::shared_ptr<Core::model::SpriteRenderer> rend);
     virtual void Travel(float deltaTime);
-
     virtual void SetPath(const std::vector<glm::vec2>& path);
 };
 }// namespace Game9
