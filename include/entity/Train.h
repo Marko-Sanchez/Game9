@@ -9,20 +9,19 @@
 
 namespace Game9
 {
-// Default class for basic trains, holds texture and model data.
-class Train
+// Holds model data and reference to a texture for this given train.
+struct Train
 {
-private:
     enum class Direction: int
     {
         FORWARD = 1,
         REVERSE = -1
     };
 
-    enum Direction m_direction;
+    Direction m_direction;
 
     // Train Texture.
-    std::shared_ptr<Core::util::Texture2D> m_sprite;
+    std::shared_ptr<Core::util::Texture2D> m_texture;
 
     // Train Model data.
     glm::vec2 m_position;
@@ -38,10 +37,9 @@ private:
     // Train path to follow using linear interpolation.
     std::vector<glm::vec2> m_path;
 
-public:
     Train();
     Train(std::shared_ptr<Core::util::Texture2D> texture, glm::vec2 pos, glm::vec2 size, glm::vec2 velocity);
-    virtual ~Train();
+    ~Train();
 
     virtual void Draw(std::shared_ptr<Core::model::SpriteRenderer> rend);
     virtual void Travel(float deltaTime);
