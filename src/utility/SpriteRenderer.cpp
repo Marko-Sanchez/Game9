@@ -6,11 +6,46 @@
 
 namespace Core::model
 {
-/* Constructor */
+/*
+* Initializes our quad between (0,0) and (1,1). Creates VBO and VAO, uploads data to GPU.
+* Uses one vertex attribute of 4 floats, to represent position on the x-y axis and
+* texture coordinates uv.
+*/
 SpriteRenderer::SpriteRenderer(std::shared_ptr<Core::util::Shader> shader):
 m_shader(shader)
 {
-    initRenderData();
+    const Vertex vertices[] =
+    {
+        // Texture coordinates are (0,0) at the bottom-left, (1,1) at top-right.
+        // pos      // tex-cordinate
+        {{0.0f, 1.0f}, {0.0f, 1.0f}}, // top-left.
+        {{0.0f, 0.0f}, {0.0f, 0.0f}}, // bottom-left.
+        {{1.0f, 0.0f}, {1.0f, 0.0f}}, // bottom-right.
+
+        {{0.0f, 1.0f}, {0.0f, 1.0f}}, // top left.
+        {{1.0f, 0.0f}, {1.0f, 0.0f}}, // bottom-right.
+        {{1.0f, 1.0f}, {1.0f, 1.0f}}  // top-right.
+    };
+
+    // Bind.
+    glGenVertexArrays(1, &m_vao);
+    glGenBuffers(1, &m_vbo);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // describe data.
+    glBindVertexArray(m_vao);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(0));
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(2 * sizeof(float)));
+
+    // UnBind.
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 /*
@@ -18,6 +53,7 @@ m_shader(shader)
  */
 SpriteRenderer::~SpriteRenderer()
 {
+    glDeleteBuffers(1, &m_vbo);
     glDeleteVertexArrays(1, &m_vao);
 }
 
@@ -73,43 +109,6 @@ void SpriteRenderer::UpdateProjection(const glm::mat4& projection)
 {
     m_shader->Bind();
     m_shader->SetUniformMat4f("u_projection", projection);
-}
-
-/*
-* Initializes our quad between (0,0) and (1,1). Creates VBO and VAO, uploads data to GPU.
-* Uses one vertex attribute of 4 floats, to represent position on the x-y axis and
-* texture coordinates uv.
-*/
-void SpriteRenderer::initRenderData()
-{
-    unsigned int VBO{};
-    const float vertices[] =
-    {
-        // Texture coordinates are (0,0) at the bottom-left, (1,1) at top-right.
-        // pos      // tex-cordinate
-        0.0f, 1.0f, 0.0f, 1.0f, // top-left.
-        0.0f, 0.0f, 0.0f, 0.0f, // bottom-left.
-        1.0f, 0.0f, 1.0f, 0.0f, // bottom-right.
-
-        0.0f, 1.0f, 0.0f, 1.0f, // top left.
-        1.0f, 0.0f, 1.0f, 0.0f, // bottom-right.
-        1.0f, 1.0f, 1.0f, 1.0f  // top-right.
-    };
-
-    // Bind.
-    glGenVertexArrays(1, &m_vao);
-    glGenBuffers(1, &VBO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindVertexArray(m_vao);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<void*>(0));
-
-    // UnBind.
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
 }
 
 /*

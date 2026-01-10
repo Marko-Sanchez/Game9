@@ -14,6 +14,11 @@
 
 namespace Core::model
 {
+struct Vertex
+{
+    glm::vec2 position;
+    glm::vec2 uvs;
+};
 /*
 * Manages a Sprite using a given shader and allows modification to its' model matrix.
 * Creates a default Quad when constructed and draws a 2D texture.
@@ -23,6 +28,7 @@ class SpriteRenderer
 private:
     std::shared_ptr<Core::util::Shader> m_shader;
     unsigned int m_vao;
+    unsigned int m_vbo;
 
 public:
     SpriteRenderer(std::shared_ptr<Core::util::Shader> shader);
@@ -34,7 +40,6 @@ public:
     void UpdateProjection(const glm::mat4& projection);
 
 private:
-    void initRenderData();
     void Draw();
 };
 }// namespace Core::model
