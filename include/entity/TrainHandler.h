@@ -11,7 +11,6 @@
 #include "utility/SpriteRenderer.h"
 #include "utility/JsonFileHandler.h"
 
-#include <array>
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -45,9 +44,6 @@ NLOHMANN_JSON_SERIALIZE_ENUM(TrainTypes,
 class TrainHandler
 {
 private:
-    /* File path to textures.*/
-    std::array<std::string_view, 2 /*TOTAL_TEXTURES*/> m_texturePaths;
-
     /* Maps train names to its type.*/
     std::unordered_map<std::string_view, TrainTypes> m_trainIdentifier;
 
@@ -64,7 +60,6 @@ private:
 
 public:
     TrainHandler(std::shared_ptr<Core::util::Shader> shader);
-    ~TrainHandler();
 
     void Draw();
     void Update(float deltaTime);

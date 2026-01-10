@@ -7,48 +7,32 @@ namespace Game9
 // File-private helpers: parse filenames and map train types.
 namespace
 {
-constexpr std::pair<std::string_view, TrainTypes> typeTable [] =
-{
-    {"tram",      TrainTypes::TRAM},
-    {"lightrail", TrainTypes::LIGHTRAIL},
-    {"subway",    TrainTypes::SUBWAY},
-    {"commuter",  TrainTypes::COMMUTER},
-    {"freight",   TrainTypes::FREIGHT}
-};
-
 /*
 * Convert string_view to TrainTypes enum.
 */
-constexpr TrainTypes toTrainType(std::string_view type)
+TrainTypes toTrainType(std::string_view type)
 {
-    for (auto&& [name, value]: typeTable)
-    {
-        if (name == type) return value;
-    }
+    if (type == "tram")      return TrainTypes::TRAM;
+    if (type == "lightrail") return TrainTypes::LIGHTRAIL;
+    if (type == "subway")    return TrainTypes::SUBWAY;
+    if (type == "commuter")  return TrainTypes::COMMUTER;
 
-    return TrainTypes::FREIGHT;
+    return TrainTypes::FREIGHT;// default
 }
 
 /*
 * Parse filename into {trainName, trainType}.
 */
-constexpr std::pair<std::string_view, std::string_view> parsefilename(std::string_view texturePath)
+std::pair<std::string, std::string> parsefilename(const std::string& filename)
 {
-    auto lastSlash = texturePath.find_last_of('/');
-    auto hyphenPos = texturePath.find('-', lastSlash != std::string_view::npos ? lastSlash : 0);
-    auto dotPos    = texturePath.find('.', hyphenPos != std::string_view::npos ? hyphenPos : 0);
-
-    if (lastSlash == std::string_view::npos ||
-        hyphenPos == std::string_view::npos ||
-        dotPos    == std::string_view::npos)
+    auto dash = filename.find('-');
+    if (dash == std::string::npos)
     {
-        return {"", ""};
+        return {};
     }
 
-    std::string_view trainType{texturePath.substr(lastSlash + 1, hyphenPos - (lastSlash + 1))};
-    std::string_view trainName{texturePath.substr(hyphenPos + 1, dotPos - (hyphenPos + 1))};
-
-    return {trainName, trainType};
+    // type, name
+    return {filename.substr(0, dash), filename.substr(dash + 1)};
 }
 } // unnamed namespace
 
@@ -57,29 +41,26 @@ TrainHandler::TrainHandler(std::shared_ptr<Core::util::Shader> shader):
 m_sprite(shader),
 m_jsonHandler("resources/gamedata/traindata.json")
 {
-    m_texturePaths =
+    const size_t TOTAL_TEXTURES{2};
+    const std::filesystem::path m_texturePaths[TOTAL_TEXTURES] =
     {
     "resources/images/trains/freight-greytrain.png",
     "resources/images/trains/freight-redtrain.png"
     };
 
     // Map trains to their types and load train textures.
-    for (size_t i{0}; i < m_texturePaths.size(); ++i)
+    for (size_t i{0}; i < TOTAL_TEXTURES; ++i)
     {
-        auto [trainName, trainType] = parsefilename(m_texturePaths[i]);
-        if (!trainName.empty() && !trainType.empty())
+        auto [trainType, trainName] = parsefilename(m_texturePaths[i].stem().string());
+        if (trainType.empty() || trainName.empty())
         {
-            std::filesystem::path p(m_texturePaths[i]);
-            m_trainIdentifier[trainName] = toTrainType(trainType);
-            // TODO: in the future all trains will be in a single texture file.
-            m_resourceManager.LoadTexture(std::filesystem::absolute(p), trainName, i + 1);
+            continue;
         }
+
+        m_trainIdentifier[trainName] = toTrainType(trainType);
+        m_resourceManager.LoadTexture(m_texturePaths[i], trainName, static_cast<int>(i + 1));
     }
 }
-
-/* Destructor.*/
-TrainHandler::~TrainHandler()
-{}
 
 /*
  * Iterates m_trains and calls draw function of train class object.
