@@ -48,7 +48,9 @@ public:
     void Tick(float frameDelta);
 
     float GetZoom() const noexcept;
-    WindowSpecification GetWindowSpecification() const noexcept;
+    float GetWidth() const noexcept;
+    float GetHeight() const noexcept;
+
     std::pair<int, int> GetFrameBufferSize() const;
     std::pair<double, double> GetMousePos() const;
 

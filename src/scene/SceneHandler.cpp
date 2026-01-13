@@ -8,8 +8,7 @@ m_texture(texture)
 {
     m_renderer = std::make_unique<Core::model::SpriteRenderer>(sceneshader);
 
-    auto windowspec = m_window->GetWindowSpecification();
-    m_model.m_scale = glm::vec2(static_cast<float>(windowspec.width * 2), static_cast<float>(windowspec.height * 2));
+    m_model.m_scale = glm::vec2(static_cast<float>(m_window->GetWidth() * 2), static_cast<float>(m_window->GetHeight() * 2));
 }
 
 /*

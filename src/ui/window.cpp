@@ -86,9 +86,14 @@ float Window::GetZoom() const noexcept
     return m_zoomFactor;
 }
 
-WindowSpecification Window::GetWindowSpecification() const noexcept
+float Window::GetWidth() const noexcept
 {
-    return m_specification;
+    return static_cast<float>(m_specification.width);
+}
+
+float Window::GetHeight() const noexcept
+{
+    return static_cast<float>(m_specification.height);
 }
 
 std::pair<int, int> Window::GetFrameBufferSize() const

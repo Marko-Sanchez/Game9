@@ -16,8 +16,8 @@ m_window(window)
 
     const std::string_view backgroundTexture{"resources/images/background.png"};
 
-    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(m_window->GetWindowSpecification().width),
-                                      0.0f, static_cast<float>(m_window->GetWindowSpecification().height),
+    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(m_window->GetWidth()),
+                                      0.0f, static_cast<float>(m_window->GetHeight()),
                                       -1.0f, 1.0f);
 
     m_resourceManager.LoadShader(vertexShader, fragmentShader, idName);
@@ -30,18 +30,13 @@ m_window(window)
                                                          m_resourceManager.LoadTexture(backgroundTexture, idName, 0));
 }
 
-BackgroundLayer::~BackgroundLayer()
-{
-
-}
-
 /*
  * Updates projection based on zoom parameters.
  */
 void BackgroundLayer::OnRender()
 {
-    const float w{static_cast<float>(m_window->GetWindowSpecification().width)};
-    const float h{static_cast<float>(m_window->GetWindowSpecification().height)};
+    const float w{static_cast<float>(m_window->GetWidth())};
+    const float h{static_cast<float>(m_window->GetHeight())};
 
     const float hw{(w * m_window->GetZoom()) * 0.5f};
     const float hh{(h * m_window->GetZoom()) * 0.5f};

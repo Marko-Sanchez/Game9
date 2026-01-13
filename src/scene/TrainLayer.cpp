@@ -11,8 +11,8 @@ m_window(window)
     const std::string_view vertexShader{"resources/shaders/background.vertex"};
     const std::string_view fragmentShader{"resources/shaders/background.fragment"};
 
-    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(m_window->GetWindowSpecification().width),
-                                      0.0f, static_cast<float>(m_window->GetWindowSpecification().height),
+    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(m_window->GetWidth()),
+                                      0.0f, static_cast<float>(m_window->GetHeight()),
                                       -1.0f, 1.0f);
 
     m_resourceManager.LoadShader(vertexShader,fragmentShader, idName);
