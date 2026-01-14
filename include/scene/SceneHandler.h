@@ -13,17 +13,12 @@
 namespace Game9
 {
 /*
-* Handles drawing of the background / map. TODO: handles drawing large images like the background
-* menu and such. unlike what other handlers that specialize in drawing the trains, etc.
+* Handles drawing of the background / map. Handles drawing large images like the background
+* menu and such; unlike what other handlers that specialize in drawing the trains, etc.
 */
 class SceneHandler
 {
 private:
-    // math unknown yet.
-    float m_offSetWidth;
-    float m_offSetHeight;
-
-    // Initial: Model position, Model size, parent model = projection ?
     Core::model::Transform m_model;
 
     std::unique_ptr<Core::model::SpriteRenderer> m_renderer;
@@ -34,9 +29,13 @@ private:
 public:
     SceneHandler(std::shared_ptr<Core::util::Shader> sceneshader, std::shared_ptr<Core::Window> window, std::shared_ptr<Core::util::Texture2D> texture);
 
+    void SetPosition(const glm::vec2& position) noexcept;
+    void SetProjection(const glm::mat4& projection) noexcept;
+
+    glm::vec2 GetPosition() const noexcept;
+    glm::vec2 GetSize() const noexcept;
+
     void Draw();
-    void UpdateModel(const Core::model::Transform& model);
-    void UpdateProjection(const glm::mat4 projection);
 };
-}
+}// namespace Game9
 #endif
