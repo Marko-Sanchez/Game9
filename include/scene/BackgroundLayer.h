@@ -27,6 +27,8 @@ private:
     std::shared_ptr<Core::Window> m_window;
     DragState m_dragstate;
 
+    bool mouseAABB(const glm::vec2& mousePosition, const glm::vec2& visibleMin, const glm::vec2& visibleMax);
+
 public:
     BackgroundLayer(std::shared_ptr<Core::Window> window);
 
