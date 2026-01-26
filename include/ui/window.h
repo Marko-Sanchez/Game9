@@ -25,15 +25,10 @@ class Window
 {
 private:
     float m_zoomFactor;
-
-    float m_lastMouseX;
-    float m_lastMouseY;
     float m_frameDelta;
 
     GLFWwindow* m_handle = nullptr;
     WindowSpecification m_specification;
-
-    bool m_firstMouseMovement;
 
 public:
     Window(const WindowSpecification& specification);
@@ -45,21 +40,20 @@ public:
     void Update();
     void RaiseEvent(Event &event);
 
-    void Tick(float frameDelta);
+    void Tick(float frameDelta) noexcept;
 
     float GetZoom() const noexcept;
     float GetWidth() const noexcept;
     float GetHeight() const noexcept;
 
     std::pair<float, float> GetFrameBufferSize() const;
-    std::pair<double, double> GetMousePos() const;
+    std::pair<double, double> GetMousePosition() const;
 
 private:
     void SetWindowIcon();
 
-    void SetWindowCallbacks();
     // callbacks.
-    void ProcessMousePosCallback(double xPosIn, double yPosIn);
+    void SetWindowCallbacks();
     void ProcessMouseScrollCallback(double xPosIn, double yPosIn);
 };
 }// namespace Core

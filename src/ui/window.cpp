@@ -76,7 +76,7 @@ void Window::RaiseEvent(Event &event)
         m_specification.EventCallback(event);
 }
 
-void Window::Tick(float frameDelta)
+void Window::Tick(float frameDelta) noexcept
 {
     m_frameDelta = frameDelta;
 }
@@ -103,7 +103,7 @@ std::pair<float, float> Window::GetFrameBufferSize() const
     return {static_cast<float>(width), static_cast<float>(height)};
 }
 
-std::pair<double, double> Window::GetMousePos() const
+std::pair<double, double> Window::GetMousePosition() const
 {
     double xpos, ypos;
     glfwGetCursorPos(m_handle, &xpos, &ypos);
@@ -226,34 +226,6 @@ void Window::SetWindowCallbacks()
         reinterpret_cast<Window*>(glfwGetWindowUserPointer(window))->RaiseEvent(event);
     });
 
-}
-
-/*
- * Called whenever mouse is moved in current context window.
- * Top-left is (0,0), bottom-left is (0, 1024).
- *
- * Note: when drawing object models and handling object movement,
- * bottom-left is considered (0, 0). Hence, we subtract current y position
- * with window height.
- */
-void Window::ProcessMousePosCallback(double xPosIn, double yPosIn)
-{
-    float xpos{static_cast<float>(xPosIn)};
-    float ypos{static_cast<float>(yPosIn)};
-
-    if (m_firstMouseMovement)
-    {
-        m_lastMouseX = xpos;
-        m_lastMouseY = ypos;
-        m_firstMouseMovement = false;
-    }
-
-    float xoffset{xpos - m_lastMouseX};
-    float yoffset{m_lastMouseY - ypos};
-
-    // Save current mouse position.
-    m_lastMouseX = xpos;
-    m_lastMouseY = m_specification.height - ypos;
 }
 
 void Window::ProcessMouseScrollCallback(double xPosIn, double yPosIn)
