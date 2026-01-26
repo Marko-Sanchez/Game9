@@ -1,12 +1,12 @@
 #include "scene/BackgroundLayer.h"
+
+#include <algorithm>
+
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/matrix.hpp"
 #include "ui/MouseEvents.h"
 #include <GLFW/glfw3.h>
-#include <algorithm>
-#include <cstdlib>
 
-#include <print>
 namespace Game9
 {
 /*
@@ -98,7 +98,9 @@ bool BackgroundLayer::OnMouseButtonPressed(Core::MouseButtonPressedEvent& event)
     {
         return false;
     }
+
     m_dragstate.dragging = true;
+    m_dragstate.lastMousePosition = m_dragstate.cachedMousePosition;
 
     return true;
 }
@@ -113,18 +115,26 @@ bool BackgroundLayer::OnMouseButtonPressed(Core::MouseButtonPressedEvent& event)
  */
 bool BackgroundLayer::OnMouseMoved(Core::MouseMovedEvent& event)
 {
+    // caching mouse position avoids jumps in texture and allows continous dragging.
+    auto [winWidth, winHeight] = m_window->GetFrameBufferSize();
+    auto mousePosition = glm::vec2{static_cast<float>(event.GetX()), winHeight - static_cast<float>(event.GetY())};
+    m_dragstate.cachedMousePosition = mousePosition;
+
     if (!m_dragstate.dragging)
     {
         return false;
     }
 
-    auto winWidth  = m_window->GetWidth();
-    auto winHeight = m_window->GetHeight();
-    auto objectPosition   = m_background->GetPosition();
-    auto size      = m_background->GetSize();
 
-    auto mouseX = static_cast<float>(event.GetX());
-    auto mouseY = winHeight - static_cast<float>(event.GetY());
+    auto objectPosition = m_background->GetPosition();
+    auto size  = m_background->GetSize();
+
+    auto delta = mousePosition - m_dragstate.lastMousePosition;
+    objectPosition.x += delta.x * 0.9f;
+    objectPosition.y += delta.y * 0.9f;
+
+    objectPosition.x = std::clamp(objectPosition.x, winWidth - size.x, 0.0f);
+    objectPosition.y = std::clamp(objectPosition.y, winWidth - size.y, 0.0f);
 
     // min-max range of texture.
     glm::vec2 objectMin = objectPosition;
@@ -142,12 +152,11 @@ bool BackgroundLayer::OnMouseMoved(Core::MouseMovedEvent& event)
         std::min(objectMax.y, winHeight)
     };
 
-    if (mouseAABB(glm::vec2{mouseX, mouseY}, visibleMin, visibleMax))
+    if (mouseAABB(mousePosition, visibleMin, visibleMax))
     {
-        // TODO: temporary sets texture to the top-right.
-        std::println("In AABB");
-        m_background->SetPosition({512.0f, 512.0f});
+        m_background->SetPosition(objectPosition);
     }
+    m_dragstate.lastMousePosition = mousePosition;
 
     return true;
 }

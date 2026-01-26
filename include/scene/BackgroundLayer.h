@@ -13,7 +13,8 @@ namespace Game9
 struct DragState
 {
     bool dragging{false};
-    glm::vec2 grabOffset;
+    glm::vec2 lastMousePosition;
+    glm::vec2 cachedMousePosition;
 };
 /*
 * Draws texture displaying background image / scenery.
