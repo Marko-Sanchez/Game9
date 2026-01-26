@@ -96,11 +96,11 @@ float Window::GetHeight() const noexcept
     return static_cast<float>(m_specification.height);
 }
 
-std::pair<int, int> Window::GetFrameBufferSize() const
+std::pair<float, float> Window::GetFrameBufferSize() const
 {
     int width, height;
     glfwGetFramebufferSize(m_handle, &width, &height);
-    return {width, height};
+    return {static_cast<float>(width), static_cast<float>(height)};
 }
 
 std::pair<double, double> Window::GetMousePos() const

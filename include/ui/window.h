@@ -51,7 +51,7 @@ public:
     float GetWidth() const noexcept;
     float GetHeight() const noexcept;
 
-    std::pair<int, int> GetFrameBufferSize() const;
+    std::pair<float, float> GetFrameBufferSize() const;
     std::pair<double, double> GetMousePos() const;
 
 private:
