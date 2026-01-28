@@ -29,12 +29,12 @@ private:
     DragState m_dragstate;
 
     bool mouseAABB(const glm::vec2& mousePosition, const glm::vec2& visibleMin, const glm::vec2& visibleMax);
+    void UpdateProjection();
 
 public:
     BackgroundLayer(std::shared_ptr<Core::Window> window);
 
     virtual void OnRender() override;
-    virtual void OnUpdate(float delta) override;
     virtual void OnEvent(Core::Event& event) override;
 
     bool OnMouseButtonPressed(Core::MouseButtonPressedEvent& event);

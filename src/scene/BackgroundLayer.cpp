@@ -6,11 +6,12 @@
 #include "glm/matrix.hpp"
 #include "ui/MouseEvents.h"
 #include <GLFW/glfw3.h>
+#include <cassert>
 
 namespace Game9
 {
 /*
- * Create Shader, load textures, and set shader argurments.
+ * Create Shader, load textures, and set shader arguments.
  */
 BackgroundLayer::BackgroundLayer(std::shared_ptr<Core::Window> window):
 m_window(window)
@@ -22,42 +23,20 @@ m_window(window)
 
     const std::string_view backgroundTexture{"resources/images/background.png"};
 
-    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(m_window->GetWidth()),
-                                      0.0f, static_cast<float>(m_window->GetHeight()),
-                                      -1.0f, 1.0f);
+    auto shader = m_resourceManager.LoadShader(vertexShader, fragmentShader, idName);
+    auto texture = m_resourceManager.LoadTexture(backgroundTexture, idName, 0);
 
-    m_resourceManager.LoadShader(vertexShader, fragmentShader, idName);
-    m_resourceManager.GetShader(idName)->Bind();
-    m_resourceManager.GetShader(idName)->SetUniform1i("u_image", 0);
-    m_resourceManager.GetShader(idName)->SetUniformMat4f("u_projection", projection);
+    shader->Bind();
+    shader->SetUniform1i("u_image", 0);
 
-    m_background = std::make_unique<SceneHandler>(m_resourceManager.GetShader(idName),
-                                                         m_window,
-                                                         m_resourceManager.LoadTexture(backgroundTexture, idName, 0));
+    m_background = std::make_unique<SceneHandler>(shader, m_window, texture);
+
+    this->UpdateProjection();
 }
 
-/*
- * Updates projection based on zoom parameters.
- */
 void BackgroundLayer::OnRender()
 {
-    const float w{static_cast<float>(m_window->GetWidth())};
-    const float h{static_cast<float>(m_window->GetHeight())};
-
-    const float hw{(w * m_window->GetZoom()) * 0.5f};
-    const float hh{(h * m_window->GetZoom()) * 0.5f};
-
-    m_background->SetProjection(
-    glm::ortho(w * 0.5f - hw, w * 0.5f + hw,
-               h * 0.5f - hh, h * 0.5f + hh,
-               -1.0f, 1.0f));
-
     m_background->Draw();
-}
-
-void BackgroundLayer::OnUpdate(float delta)
-{
-
 }
 
 void BackgroundLayer::OnEvent(Core::Event& event)
@@ -90,6 +69,21 @@ bool BackgroundLayer::mouseAABB(const glm::vec2& mousePosition, const glm::vec2&
                       mousePosition.y <= visibleMax.y;
 
     return collisionX && collisionY;
+}
+
+/*
+ * On window resize, update projection.
+ */
+void BackgroundLayer::UpdateProjection()
+{
+    if (!m_background)
+    {
+        return;
+    }
+
+    const auto [width, height] = m_window->GetFrameBufferSize();
+
+    m_background->SetProjection(glm::ortho(0.0f, width, 0.0f, height, -1.0f, 1.0f));
 }
 
 bool BackgroundLayer::OnMouseButtonPressed(Core::MouseButtonPressedEvent& event)
@@ -127,14 +121,14 @@ bool BackgroundLayer::OnMouseMoved(Core::MouseMovedEvent& event)
 
 
     auto objectPosition = m_background->GetPosition();
-    auto size  = m_background->GetSize();
+    auto size  = m_background->GetScale();
 
     auto delta = mousePosition - m_dragstate.lastMousePosition;
     objectPosition.x += delta.x * 0.9f;
     objectPosition.y += delta.y * 0.9f;
 
     objectPosition.x = std::clamp(objectPosition.x, winWidth - size.x, 0.0f);
-    objectPosition.y = std::clamp(objectPosition.y, winWidth - size.y, 0.0f);
+    objectPosition.y = std::clamp(objectPosition.y, winHeight - size.y, 0.0f);
 
     // min-max range of texture.
     glm::vec2 objectMin = objectPosition;

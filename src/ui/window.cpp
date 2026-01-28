@@ -1,5 +1,6 @@
 #include "ui/window.h"
 
+#include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
 #include <array>
@@ -37,6 +38,10 @@ m_specification(specification)
     // Make Window Current Context, set swap interval to wait for 1 screen update before swapping buffers.
     glfwMakeContextCurrent(m_handle);
     glfwSwapInterval(1);
+
+    // explicitly set viewport, default set to dimensions of window.
+    const auto [width, height] = this->GetFrameBufferSize();
+    glViewport(0.0f, 0.0f, width, height);
 
     this->SetWindowCallbacks();
 }
