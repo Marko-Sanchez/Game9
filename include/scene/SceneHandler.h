@@ -19,21 +19,20 @@ namespace Game9
 class SceneHandler
 {
 private:
-    Core::model::Transform m_model;
-
     std::unique_ptr<Core::model::SpriteRenderer> m_renderer;
-
     std::shared_ptr<Core::Window> m_window;
     std::shared_ptr<Core::util::Texture2D> m_texture;
+
+    Core::model::Transform m_model;
 
 public:
     SceneHandler(std::shared_ptr<Core::util::Shader> sceneshader, std::shared_ptr<Core::Window> window, std::shared_ptr<Core::util::Texture2D> texture);
 
     void SetPosition(const glm::vec2& position) noexcept;
-    void SetProjection(const glm::mat4& projection) noexcept;
+    void SetProjection(const glm::mat4& projection);
 
     glm::vec2 GetPosition() const noexcept;
-    glm::vec2 GetSize() const noexcept;
+    glm::vec2 GetScale() const noexcept;
 
     void Draw();
 };
