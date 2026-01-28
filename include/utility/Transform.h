@@ -10,17 +10,17 @@ namespace Core::model
  * Calculates the Model-View-Projection determining how model / object / sprite
  * is drawn.
  */
-class Transform
+struct Transform
 {
 public:
     // Local space information.
-    glm::vec2 m_position;
-    glm::vec2 m_scale;
+    glm::vec2 position;
+    glm::vec2 scale;
 
-    float m_rotation;
+    float rotation;
 
     // Global space information.
-    glm::mat4 m_parentMatrix;
+    glm::mat4 parentMatrix;
 
     Transform();
     Transform(glm::mat4 globalmatrix, glm::vec2 pos, glm::vec2 scale, float rotation);

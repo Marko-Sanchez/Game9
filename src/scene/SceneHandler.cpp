@@ -12,12 +12,12 @@ m_texture(texture)
     assert(m_texture);
 
     const auto [width, height] = m_window->GetFrameBufferSize();
-    m_model.m_scale = glm::vec2(width * 2, height * 2);
+    m_model.scale = glm::vec2(width * 2, height * 2);
 }
 
 void SceneHandler::SetPosition(const glm::vec2& position) noexcept
 {
-    m_model.m_position = position;
+    m_model.position = position;
 }
 
 void SceneHandler::SetProjection(const glm::mat4& projection)
@@ -28,12 +28,12 @@ void SceneHandler::SetProjection(const glm::mat4& projection)
 
 glm::vec2 SceneHandler::GetPosition() const noexcept
 {
-    return m_model.m_position;
+    return m_model.position;
 }
 
 glm::vec2 SceneHandler::GetScale() const noexcept
 {
-    return m_model.m_scale;
+    return m_model.scale;
 }
 
 void SceneHandler::Draw()
@@ -41,9 +41,9 @@ void SceneHandler::Draw()
     assert(m_renderer && m_texture);
     m_renderer->DrawSprite(
             m_texture,
-            m_model.m_position,
-            m_model.m_scale,
-            m_model.m_rotation
+            m_model.position,
+            m_model.scale,
+            m_model.rotation
             );
 }
 }// namespace Game9
