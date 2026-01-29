@@ -63,6 +63,8 @@ public:
 
     void Draw();
     void Update(float deltaTime);
+    void UpdateProjection(const glm::mat4& projection);
+
     void LoadPaths();
     void AddTrain(const std::string& name, std::string_view trainName, const std::vector<glm::vec2>& path);
     void ExtendService(std::string_view trainName, const std::vector<glm::vec2>& path);
