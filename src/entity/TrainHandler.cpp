@@ -84,14 +84,18 @@ void TrainHandler::Update(float deltaTime)
     }
 }
 
+void TrainHandler::UpdateProjection(const glm::mat4& projection)
+{
+    m_sprite.UpdateProjection(projection);
+}
+
 /*
 * Loads train data: object name, train name, train type, and path.
 */
 void TrainHandler::LoadPaths()
 {
-    // TODO: For testing purposes.
-    constexpr int WINDOW_WIDTH{1024};
-    constexpr int WINDOW_HEIGHT{1024};
+    const glm::vec2 scale{64, 64};
+    const glm::vec2 velocity{50, 50};
 
     // Read file and load json data to member variable.
     if (auto ex = m_jsonHandler.Read(); !ex)
@@ -106,8 +110,7 @@ void TrainHandler::LoadPaths()
             std::string objectName = train["name"].template get<std::string>();
             std::string trainName  = train["trainName"].template get<std::string>();
 
-            // TODO: getting values for model: initial position, size, and velocity.
-            m_trains.try_emplace(objectName, m_resourceManager.GetTexture(trainName), glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), glm::vec2(64, 64), glm::vec2(50, 50));
+            m_trains.try_emplace(objectName, m_resourceManager.GetTexture(trainName), scale, velocity);
             m_trains[objectName].SetPath(path);
         }
     }
@@ -119,13 +122,13 @@ void TrainHandler::LoadPaths()
 */
 void TrainHandler::AddTrain(const std::string& name, std::string_view trainName, const std::vector<glm::vec2>& path)
 {
-    constexpr int WINDOW_WIDTH{1024};
-    constexpr int WINDOW_HEIGHT{1024};
-
     if (m_trains.find(name) != m_trains.end() || m_trainIdentifier.find(trainName) == m_trainIdentifier.end())
     {
         return;
     }
+
+    const glm::vec2 scale{64, 64};
+    const glm::vec2 velocity{50, 50};
 
     nlohmann::json train =
     {
@@ -138,6 +141,6 @@ void TrainHandler::AddTrain(const std::string& name, std::string_view trainName,
     m_jsonHandler.m_jsonData["trains"].emplace_back(train);
     std::println("{}", m_jsonHandler.m_jsonData.dump(4));
 
-    m_trains.try_emplace(name, m_resourceManager.GetTexture(trainName), glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), glm::vec2(64, 64), glm::vec2(50, 50));
+    m_trains.try_emplace(name, m_resourceManager.GetTexture(trainName), scale, velocity);
 }
 }// namespace Game9

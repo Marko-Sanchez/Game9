@@ -27,22 +27,23 @@ struct Train
     glm::vec2 m_size;
     glm::vec2 m_velocity;
 
+    float m_speed;
     float m_rotation;
 
     // Current index along path, and progress to next index.
-    float m_segmentProgess;
+    float m_segmentProgress;
     int m_currentSegment;
 
     // Train path to follow using linear interpolation.
     std::vector<glm::vec2> m_path;
 
     Train();
-    Train(std::shared_ptr<Core::util::Texture2D> texture, glm::vec2 pos, glm::vec2 size, glm::vec2 velocity);
+    Train(std::shared_ptr<Core::util::Texture2D> texture, glm::vec2 size, glm::vec2 velocity);
 
-    ~Train();
+    ~Train() = default;
 
-    virtual void Travel(float deltaTime);
-    virtual void SetPath(const std::vector<glm::vec2>& path);
+    void Travel(float deltaTime);
+    void SetPath(const std::vector<glm::vec2>& path);
 };
 }// namespace Game9
 #endif
