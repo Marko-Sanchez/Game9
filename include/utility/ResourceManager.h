@@ -1,10 +1,10 @@
 #ifndef RESOURCEMANGER_H
 #define RESOURCEMANGER_H
 
+#include <GL/glew.h>
+
 #include "utility/Shader.h"
 #include "utility/Texture2D.h"
-
-#include <GL/glew.h>
 
 #include <memory>
 #include <functional>

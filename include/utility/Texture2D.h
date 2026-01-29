@@ -1,41 +1,43 @@
 #ifndef TEXTURE2D_H
 #define TEXTURE2D_H
 
+#include <GL/gl.h>
 #include <filesystem>
 
 namespace Core::util
 {
+
+struct TextureParams
+{
+    GLint wrapS{GL_CLAMP_TO_EDGE};
+    GLint wrapT{GL_CLAMP_TO_EDGE};
+    GLint minFilter{GL_LINEAR};
+    GLint magFilter{GL_LINEAR_MIPMAP_LINEAR};
+
+    bool generateMipmaps{true};
+};
 /*
 * Generates a 2D Texture using third-party vendor STBI to load
 * image data.
 */
 class Texture2D
 {
+private:
+    GLuint m_ID;
+    GLint m_textureSlot;
+
+    TextureParams m_texParams;
+
 public:
-    unsigned int m_ID;
-    int m_textureSlot;
+    Texture2D(const std::filesystem::path& texturePath, int textureSlot = 0, TextureParams params = {});
+    Texture2D(Texture2D&& other) noexcept;
+    Texture2D(const Texture2D&) = delete;
+    Texture2D& operator=(const Texture2D&) = delete;
 
-    int m_width;
-    int m_height;
-
-    // Describes how the texture will be stored in the GPU.
-    // stbi_load will return the number of channels in the image
-    // if desired_channels (last value) is 0.
-    int m_internalFormat;
-    // Defines data being passed to GPU.
-    int m_imageFormat;
-
-    unsigned int m_wrapS;
-    unsigned int m_wrapT;
-
-    unsigned int m_filterMin;
-    unsigned int m_filterMax;
-
-    Texture2D(const std::filesystem::path& texturePath, int textureSlot = 0);
     ~Texture2D();
 
-    unsigned int GetID() const noexcept;
-    int GetTextureSlot() const noexcept;
+    GLuint GetID() const noexcept;
+    GLint GetTextureSlot() const noexcept;
 
     void Bind() const;
     void UnBind() const;

@@ -6,8 +6,8 @@
 
 #include <nlohmann/json.hpp>
 
-#include "entity/Train.h"
 #include "utility/ResourceManager.h"
+#include "entity/Train.h"
 #include "utility/SpriteRenderer.h"
 #include "utility/JsonFileHandler.h"
 
