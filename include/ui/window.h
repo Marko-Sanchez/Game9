@@ -50,8 +50,6 @@ public:
     std::pair<double, double> GetMousePosition() const;
 
 private:
-    void SetWindowIcon();
-
     // callbacks.
     void SetWindowCallbacks();
     void ProcessMouseScrollCallback(double xPosIn, double yPosIn);

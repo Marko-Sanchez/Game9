@@ -3,9 +3,7 @@
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
-#include <array>
 #include <cassert>
-#include <filesystem>
 #include <print>
 #include <cstdio>
 #include <stb/stb_image.h>
@@ -113,49 +111,6 @@ std::pair<double, double> Window::GetMousePosition() const
     double xpos, ypos;
     glfwGetCursorPos(m_handle, &xpos, &ypos);
     return {xpos, ypos};
-}
-
-// Note:
-// Due to Gnome terminal not having the option to display window-icons, this function
-// is not tested and thus not called. Through some research glfwSetWindowIcon() may need
-// to be called early in window context creation thus this code is replicated in main.cpp;
-// Although, this function remains here until it's possible to test.
-void Window::SetWindowIcon()
-{
-    const std::array<std::filesystem::path, 3> files =
-    {
-        "resources/images/winIcon64.png",
-        "resources/images/winIcon32.png",
-        "resources/images/winIcon16.png"
-    };
-
-    std::error_code ec;
-    for (const auto& file: files)
-    {
-        if (!std::filesystem::exists(file, ec))
-        {
-            std::println(stderr, "Image does not exist: {}", ec.message());
-            return;
-        }
-    }
-
-    GLFWimage icons[3];
-
-    std::shared_ptr<unsigned char> data64(stbi_load(files[0].c_str(), &icons[0].width, &icons[0].height, 0, 4), stbi_image_free);
-    std::shared_ptr<unsigned char> data32(stbi_load(files[1].c_str(), &icons[1].width, &icons[1].height, 0, 4), stbi_image_free);
-    std::shared_ptr<unsigned char> data16(stbi_load(files[2].c_str(), &icons[2].width, &icons[2].height, 0, 4), stbi_image_free);
-
-    icons[0].pixels = data64.get();
-    icons[1].pixels = data32.get();
-    icons[2].pixels = data16.get();
-
-    if (!data64 || !data32 || !data16)
-    {
-        std::println(stderr, "Failed to load icon image.");
-        return;
-    }
-
-    glfwSetWindowIcon(m_handle, 3, icons);
 }
 
 void Window::SetWindowCallbacks()
