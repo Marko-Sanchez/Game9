@@ -1,8 +1,8 @@
 #include "entity/Train.h"
 
-#include "glm/geometric.hpp"
+#include <glm/geometric.hpp>
 
-namespace Game9
+namespace Entity
 {
 Train::Train():
 m_direction(Direction::FORWARD),
@@ -13,7 +13,7 @@ m_segmentProgress(0.0f), m_currentSegment(0)
     m_speed = glm::length(m_velocity);
 }
 
-Train::Train(std::shared_ptr<Core::util::Texture2D> texture, glm::vec2 size, glm::vec2 velocity):
+Train::Train(std::shared_ptr<Renderer::Texture2D> texture, glm::vec2 size, glm::vec2 velocity):
 m_direction(Direction::FORWARD),
 m_texture(texture),
 m_position(0.0f, 0.0f), m_size(size), m_velocity(velocity), m_rotation(0.0f),
@@ -91,4 +91,4 @@ void Train::SetPath(const std::vector<glm::vec2>& path)
     m_direction = Direction::FORWARD;
     m_position = m_path.front();
 }
-}// namespace Game9
+}// namespace Entity

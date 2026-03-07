@@ -19,7 +19,7 @@ void from_json(const nlohmann::json& j, glm::vec2& v)
 }
 }
 
-namespace Core::util
+namespace Utility
 {
 JsonFileHandler::JsonFileHandler(const std::filesystem::path& fileName):
 m_jsonFileName(fileName)
@@ -95,4 +95,4 @@ std::expected<void, std::string> JsonFileHandler::Write() const
 
     return {};
 }
-}// namespace Core::util
+}// namespace Utility

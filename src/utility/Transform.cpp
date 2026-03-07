@@ -1,7 +1,8 @@
 #include "utility/Transform.h"
-#include "glm/ext/matrix_transform.hpp"
 
-namespace Core::model
+#include <glm/ext/matrix_transform.hpp>
+
+namespace Utility
 {
 Transform::Transform()
 {
@@ -43,4 +44,4 @@ void Transform::SetParentMatrix(const glm::mat4& parentMatrix)
 {
     this->parentMatrix = parentMatrix;
 }
-}// namespace Core::model
+}// namespace Utility
