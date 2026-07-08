@@ -2,6 +2,7 @@
 #define TRAIN_H
 
 #include <memory>
+#include <vector>
 
 #include <glm/glm.hpp>
 
