@@ -1,5 +1,5 @@
 ![game nine banner](resources/images/readme-title.png "Game9 Banner")
-[![wakatime]([wakaimage])]([wakahours])
+[![wakatime](https://wakatime.com/badge/user/f6244e02-6622-43fe-a0a9-cdbfd95dfe72/project/089cea2c-f28c-4232-9d39-3455e27ee1e7.svg)](https://wakatime.com/badge/user/f6244e02-6622-43fe-a0a9-cdbfd95dfe72/project/089cea2c-f28c-4232-9d39-3455e27ee1e7)
 
 <p align="center">
 Game9 the 9th game in the series.
@@ -23,6 +23,3 @@ cmake -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build
 ```
 Finally, the executable should be `build/src/game9`
-
-[wakaimage]: https://wakatime.com/badge/user/f6244e02-6622-43fe-a0a9-cdbfd95dfe72/project/089cea2c-f28c-4232-9d39-3455e27ee1e7.svg
-[wakahours]: https://wakatime.com/badge/user/f6244e02-6622-43fe-a0a9-cdbfd95dfe72/project/089cea2c-f28c-4232-9d39-3455e27ee1e7
