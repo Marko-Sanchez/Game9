@@ -16,7 +16,7 @@ target_link_libraries(gamenine-layers
     PUBLIC
         gamenine-events
         gamenine-managers
+        gamenine-core
         GLEW
         glm
-        gamenine-core
 )
