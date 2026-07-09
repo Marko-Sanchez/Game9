@@ -20,6 +20,9 @@ class CompositeComponent: public WorldComponent
 
     public:
 
+        // Inherit WorldComponent constructors.
+        using WorldComponent::WorldComponent;
+
         void OnUpdate(float deltaSeconds) override
         {
             for (const auto& child: _children)
