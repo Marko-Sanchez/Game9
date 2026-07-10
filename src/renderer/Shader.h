@@ -1,10 +1,11 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <glm/glm.hpp>
-
 #include <string>
+#include <filesystem>
 #include <unordered_map>
+
+#include <glm/glm.hpp>
 
 namespace Renderer
 {
@@ -22,19 +23,24 @@ private:
     // (vertex, fragment, etc) into a single executable that runs on the GPU.
     unsigned int m_programID;
 
-    // Compiled shader IDs.
-    unsigned int m_vertexID;
-    unsigned int m_fragmentID;
-
     // Holds variables from shader file, ex. Sampler2D.
     std::unordered_map<std::string, int> m_uniformLocationCache;
 
 public:
-    Shader(unsigned int vertexID, unsigned int fragmentID);
+
+    Shader(const std::filesystem::path& vertex, const std::filesystem::path& fragment);
     ~Shader();
 
+    Shader(Shader&&)            noexcept;
+    Shader& operator=(Shader&&) noexcept;
+
+    Shader(const Shader&)            = delete;
+    Shader& operator=(const Shader&) = delete;
+
+    std::string ParseShaderFile(const std::filesystem::path& filepath);
+    unsigned int CompileShader(unsigned int type, const std::string& source);
+
     unsigned int GetID() const noexcept;
-    std::pair<unsigned int, unsigned int> GetFileIDs() const noexcept;
 
     void Bind() const;
     void UnBind() const;

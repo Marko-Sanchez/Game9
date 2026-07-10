@@ -4,11 +4,8 @@
 #include <cstdio>
 #include <print>
 
-#include <fstream>
 #include <filesystem>
-#include <stdexcept>
 #include <string_view>
-#include <system_error>
 
 #include <stb_image.h>
 
@@ -73,18 +70,8 @@ std::shared_ptr<Renderer::Shader> ResourceManager::LoadShader(const std::filesys
 
     try
     {
-        auto &v = m_files.try_emplace(
-                vertexPath.string(),
-                CompileShader(GL_VERTEX_SHADER, ParseShaderFile(vertexPath))
-                ).first->second;
-
-        auto &f = m_files.try_emplace(
-                fragmentPath.string(),
-                CompileShader(GL_FRAGMENT_SHADER, ParseShaderFile(fragmentPath))
-                ).first->second;
-
         // Create Shader.
-        auto shader = std::make_shared<Renderer::Shader>(v.ID, f.ID);
+        auto shader = std::make_shared<Renderer::Shader>(vertexPath, fragmentPath);
         m_shader.emplace(std::string{shaderName}, shader);
 
         return shader;
@@ -172,67 +159,4 @@ std::shared_ptr<unsigned char> ResourceManager::LoadImage(const std::string_view
     return std::shared_ptr<unsigned char>(stbi_load(path.data(), &width, &height, 0, 4), stbi_image_free);
 }
 
-/*
-* Reads contents from file and returns as a string.
-*/
-std::string ResourceManager::ParseShaderFile(const std::filesystem::path& filepath)
-{
-    std::ifstream ifs(filepath, std::ios_base::in | std::ios_base::binary);
-    if (!ifs)
-    {
-        throw std::ios_base::failure(std::format("Failed to open file for reading: {}", filepath.string()));
-    }
-
-    std::string contents;
-
-    std::error_code ec;
-    if (const auto size = std::filesystem::file_size(filepath, ec); !ec)
-    {
-        contents.reserve(static_cast<size_t>(size));
-    }
-
-    std::array<char, 1024> buffer;
-    while (ifs.read(buffer.data(), buffer.size()))
-    {
-        contents.append(buffer.data(), buffer.size());
-    }
-    contents.append(buffer.data(), ifs.gcount());
-
-    return contents;
-}
-
-/*
- * Sets the shader source code to an ID: glShaderSource(),
- * then compiles the source code: glCompileShader().
- *
- * @param:
- * unsigned int {type}: type of shader; vertex or fragment.
- * const std::string {source}: file contents.
- */
-unsigned int ResourceManager::CompileShader(unsigned int type, const std::string& source)
-{
-    unsigned int id{glCreateShader(type)};
-    const char* src = source.c_str();
-    glShaderSource(id, 1, &src, nullptr);
-    glCompileShader(id);
-
-    // check if shader compiled successfully, else print log error.
-    int result{};
-    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-    if (result == GL_FALSE)
-    {
-        int length;
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-
-        std::string message;
-        message.reserve(length);
-        glGetShaderInfoLog(id, length, &length, message.data());
-
-        glDeleteShader(id);
-
-        throw std::runtime_error(std::format("Failed to compile {} shader: {}", (type == GL_VERTEX_SHADER ? "vertex" : "fragment"), message));
-    }
-
-    return id;
-}
 }// namespace Manager

@@ -42,6 +42,7 @@ private:
     std::map<std::string, std::shared_ptr<Renderer::Texture2D>, std::less<>> m_textures;
 
 public:
+
     std::shared_ptr<Renderer::Shader> LoadShader(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath, const std::string_view shaderName);
     std::shared_ptr<Renderer::Shader> GetShader(const std::string_view shaderName);
 
@@ -49,12 +50,6 @@ public:
     std::shared_ptr<Renderer::Texture2D> GetTexture(const std::string_view textureName);
 
     std::shared_ptr<unsigned char> LoadImage(const std::string_view path, int& width, int& height);
-
-    // TODO: function to remove un-used textures and shaders.
-private:
-
-    std::string ParseShaderFile(const std::filesystem::path& filepath);
-    unsigned int CompileShader(unsigned int type, const std::string& source);
 
 };
 }// namespace Manager

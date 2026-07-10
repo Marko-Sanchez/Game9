@@ -4,26 +4,27 @@
 #include <cstdio>
 #include <stdexcept>
 #include <string>
+#include <fstream>
 
 #include <GL/glew.h>
 
 namespace Renderer
 {
 /*
- * Attach vertex and fragment to m_programID. Shader deletion is handled by
- * ShaderFileHandler in ResourceManager class.
+ * Parse and Compile Shader.
  */
-Shader::Shader(unsigned int vertexID, unsigned int fragmentID):
-m_vertexID(vertexID),
-m_fragmentID(fragmentID)
+Shader::Shader(const std::filesystem::path& vertex, const std::filesystem::path& fragment)
 {
+    auto vertexID   = CompileShader(GL_VERTEX_SHADER, ParseShaderFile(vertex));
+    auto fragmentID = CompileShader(GL_FRAGMENT_SHADER, ParseShaderFile(fragment));
+
     if (m_programID = glCreateProgram(); !m_programID)
     {
         throw std::runtime_error("glCreateProgram failed.");
     }
 
-    glAttachShader(m_programID, m_vertexID);
-    glAttachShader(m_programID, m_fragmentID);
+    glAttachShader(m_programID, vertexID);
+    glAttachShader(m_programID, fragmentID);
     glLinkProgram(m_programID);
 
     glValidateProgram(m_programID);
@@ -32,13 +33,20 @@ m_fragmentID(fragmentID)
     glGetProgramiv(m_programID, GL_LINK_STATUS, &linkStatus);
     if (linkStatus == GL_FALSE)
     {
-        char log[1024] = {};
-        int loglength{};
+        int loglength;
+        glGetProgramiv(m_programID, GL_INFO_LOG_LENGTH, &loglength);
 
-        glGetProgramInfoLog(m_programID, 1024, &loglength, log);
+        std::string message(loglength, '\0');
+        glGetProgramInfoLog(m_programID, 1024, &loglength, message.data());
 
-        throw std::runtime_error(std::string{"Program failed to link/validate: "} + log);
+        glDeleteShader(vertexID);
+        glDeleteShader(fragmentID);
+
+        throw std::runtime_error(std::string{"Program failed to link/validate: "} + message);
     }
+
+    glDeleteShader(vertexID);
+    glDeleteShader(fragmentID);
 }
 
 Shader::~Shader()
@@ -49,21 +57,110 @@ Shader::~Shader()
     }
 }
 
+Shader::Shader(Shader&& other) noexcept
+{
+    if (m_programID != 0)
+    {
+        glDeleteProgram(m_programID);
+    }
+
+    m_programID            = other.m_programID;
+    m_uniformLocationCache = std::move(other.m_uniformLocationCache);
+
+    other.m_programID = 0;
+    other.m_uniformLocationCache.clear();
+}
+
+Shader& Shader::operator=(Shader&& other) noexcept
+{
+    if (this != &other)
+    {
+        if (m_programID != 0)
+        {
+            glDeleteProgram(m_programID);
+        }
+
+        m_programID            = other.m_programID;
+        m_uniformLocationCache = std::move(other.m_uniformLocationCache);
+
+        other.m_programID = 0;
+        other.m_uniformLocationCache.clear();
+    }
+
+    return *this;
+}
+
+/*
+* Reads contents from file and returns as a string.
+*/
+std::string Shader::ParseShaderFile(const std::filesystem::path& filepath)
+{
+    std::ifstream ifs(filepath, std::ios_base::in | std::ios_base::binary);
+    if (!ifs)
+    {
+        throw std::ios_base::failure(std::format("Failed to open file for reading: {}", filepath.string()));
+    }
+
+    std::string contents;
+
+    std::error_code ec;
+    if (const auto size = std::filesystem::file_size(filepath, ec); !ec)
+    {
+        contents.reserve(static_cast<size_t>(size));
+    }
+
+    std::array<char, 1024> buffer;
+    while (ifs.read(buffer.data(), buffer.size()))
+    {
+        contents.append(buffer.data(), buffer.size());
+    }
+    contents.append(buffer.data(), ifs.gcount());
+
+    return contents;
+}
+
+/*
+ * Sets the shader source code to an ID: glShaderSource(),
+ * then compiles the source code: glCompileShader().
+ *
+ * @param:
+ * unsigned int {type}: type of shader; vertex or fragment.
+ * const std::string {source}: file contents.
+ */
+unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
+{
+    auto id {glCreateShader(type)};
+
+    const char* src = source.c_str();
+    glShaderSource(id, 1, &src, nullptr);
+    glCompileShader(id);
+
+    // check if shader compiled successfully, else print log error.
+    int result {};
+    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+    if (result == GL_FALSE)
+    {
+        int length;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+
+        std::string message;
+        message.reserve(length);
+        glGetShaderInfoLog(id, length, &length, message.data());
+
+        glDeleteShader(id);
+
+        throw std::runtime_error(std::format("Failed to compile {} shader: {}", (type == GL_VERTEX_SHADER ? "vertex" : "fragment"), message));
+    }
+
+    return id;
+}
+
 /*
  * Returns Shader program ID. If function returns 0, shader has no been created or error occured.
  */
 unsigned int Shader::GetID() const noexcept
 {
     return m_programID;
-}
-
-/*
- * Returns pair of shader file IDs.
- */
-std::pair<unsigned int, unsigned int> Shader::GetFileIDs() const noexcept
-{
-    // Copy Elison: Creation of a class object from source object can be ommited.
-    return {m_vertexID, m_fragmentID};
 }
 
 void Shader::Bind() const
