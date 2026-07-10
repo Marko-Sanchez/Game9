@@ -3,16 +3,16 @@
 
 #include <filesystem>
 
-#include <GL/gl.h>
+#include <GL/glew.h>
 
 namespace Renderer
 {
 struct TextureParams
 {
-    GLint wrapS{GL_CLAMP_TO_EDGE};
-    GLint wrapT{GL_CLAMP_TO_EDGE};
-    GLint minFilter{GL_LINEAR};
-    GLint magFilter{GL_LINEAR_MIPMAP_LINEAR};
+    GLint wrapS     {GL_CLAMP_TO_EDGE};
+    GLint wrapT     {GL_CLAMP_TO_EDGE};
+    GLint minFilter {GL_LINEAR_MIPMAP_LINEAR};
+    GLint magFilter {GL_LINEAR};
 
     bool generateMipmaps{true};
 };
@@ -23,15 +23,19 @@ struct TextureParams
 class Texture2D
 {
 private:
+
     GLuint m_ID;
-    GLint m_textureSlot;
+    GLint  m_textureSlot;
 
     TextureParams m_texParams;
 
 public:
+
     Texture2D(const std::filesystem::path& texturePath, int textureSlot = 0, TextureParams params = {});
     Texture2D(Texture2D&& other) noexcept;
-    Texture2D(const Texture2D&) = delete;
+    Texture2D& operator=(Texture2D&&) noexcept;
+
+    Texture2D(const Texture2D&)            = delete;
     Texture2D& operator=(const Texture2D&) = delete;
 
     ~Texture2D();

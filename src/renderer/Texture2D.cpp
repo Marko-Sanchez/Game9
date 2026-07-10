@@ -4,6 +4,7 @@
 #include <cassert>
 #include <stdexcept>
 
+#include <GL/glew.h>
 #include <stb_image.h>
 
 namespace Renderer
@@ -22,7 +23,7 @@ m_texParams(params)
 {
     assert(m_textureSlot < GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
 
-    stbi_set_flip_vertically_on_load(1);
+    stbi_set_flip_vertically_on_load(true);
 
     // stbi_load will return the number of channels in the image if desired_channels (last value) is 0.
     int channels{0}, imageWidth{0}, imageHeight{0};
@@ -53,16 +54,18 @@ m_texParams(params)
     if (buffer)
     {
         glGenTextures(1, &m_ID);
-        this->Bind();
-
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, imageWidth, imageHeight, 0, dataFormat, GL_UNSIGNED_BYTE, buffer.get());
+        glActiveTexture(GL_TEXTURE0 + m_textureSlot);
+        glBindTexture(GL_TEXTURE_2D, m_ID);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_texParams.wrapS);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_texParams.wrapT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_texParams.minFilter);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_texParams.magFilter);
 
-        this->UnBind();
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, imageWidth, imageHeight, 0, dataFormat, GL_UNSIGNED_BYTE, buffer.get());
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
     else
     {
@@ -72,13 +75,44 @@ m_texParams(params)
 
 Texture2D::Texture2D(Texture2D&& other) noexcept
 {
-    m_ID = other.m_ID;
+    if (this->m_ID != 0)
+    {
+        glDeleteTextures(1, &this->m_ID);
+    }
+
+    this->m_ID          = other.m_ID;
+    this->m_textureSlot = other.m_textureSlot;
+    this->m_texParams   = std::move(other.m_texParams);
+
     other.m_ID = 0;
+    other.m_textureSlot = 0;
+}
+
+Texture2D& Texture2D::operator=(Texture2D&& other) noexcept
+{
+    if (&other == this)
+    {
+        return *this;
+    }
+
+    if (this->m_ID != 0)
+    {
+        glDeleteTextures(1, &this->m_ID);
+    }
+
+    this->m_ID          = other.m_ID;
+    this->m_textureSlot = other.m_textureSlot;
+    this->m_texParams   = std::move(other.m_texParams);
+
+    other.m_ID = 0;
+    other.m_textureSlot = 0;
+
+    return *this;
 }
 
 Texture2D::~Texture2D()
 {
-    if (m_ID)
+    if (m_ID != 0)
     {
         glDeleteTextures(1, &m_ID);
     }
