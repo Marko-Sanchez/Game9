@@ -2,6 +2,7 @@
 #define COMPOSITECOMPONENT_H
 
 #include "world.h"
+#include "events/Events.h"
 
 #include <memory>
 #include <vector>
@@ -22,6 +23,14 @@ class CompositeComponent: public WorldComponent
 
         // Inherit WorldComponent constructors.
         using WorldComponent::WorldComponent;
+
+        void OnEvent(Event::Event& event) override
+        {
+            for (const auto& child: _children)
+            {
+                child->OnEvent(event);
+            }
+        }
 
         void OnUpdate(float deltaSeconds) override
         {

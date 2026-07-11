@@ -6,6 +6,8 @@
 
 #include <glm/glm.hpp>
 
+#include "events/Events.h"
+
 namespace World
 {
 /*
@@ -22,11 +24,12 @@ class WorldComponent
 
         virtual ~WorldComponent() = default;
 
-        virtual void OnUpdate(float deltaSeconds = 0) {};
-        virtual void OnRender() const {};
+        virtual void OnEvent(Event::Event&) {}
+        virtual void OnUpdate(float deltaSeconds = 0) {}
+        virtual void OnRender() const {}
 
-        virtual void AddChildren(std::shared_ptr<WorldComponent>) {};
-        virtual void RemoveChildren(Id) {};
+        virtual void AddChildren(std::shared_ptr<WorldComponent>) {}
+        virtual void RemoveChildren(Id) {}
 
         virtual const std::vector<std::shared_ptr<WorldComponent>>& GetChildren() const
         {

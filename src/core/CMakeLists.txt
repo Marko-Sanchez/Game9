@@ -12,6 +12,7 @@ target_include_directories(gamenine-core
 
 target_link_libraries(gamenine-core
     PUBLIC
-        glm
+        glm::glm
         glfw
+        gamenine-events
 )
