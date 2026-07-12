@@ -2,6 +2,7 @@
 #define WORLD_H
 
 #include <memory>
+#include <atomic>
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -10,6 +11,16 @@
 
 namespace World
 {
+
+using ComponentId = std::uint64_t;
+
+inline ComponentId GenerateComponentId()
+{
+    static std::atomic<ComponentId> next {1};
+    return next++;
+}
+
+
 /*
  * Shared interface for anything that lives in the world. Design Pattern: Composite.
  */
@@ -17,7 +28,7 @@ class WorldComponent
 {
     public:
 
-        using Id = std::uint64_t;
+        using Id = ComponentId;
 
         explicit WorldComponent(Id id, std::string name):
             _id(id), _name(std::move(name)) {}
