@@ -1,6 +1,7 @@
 add_library(gamenine-core
         world.h
         compositecomponent.h
+        boatcomponent.h
         window.h
         window.cpp
 )
