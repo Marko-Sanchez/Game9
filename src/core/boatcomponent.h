@@ -32,6 +32,11 @@ class BoatComponent: public WorldComponent
         };
 
         using WorldComponent::WorldComponent;
+        BoatComponent(Id id, std::string name, glm::vec3 position, BoatType boatType):
+            WorldComponent::WorldComponent(id, name),
+            _position(position),
+            _boatType(boatType)
+        {}
 
         virtual ~BoatComponent() = default;
 
