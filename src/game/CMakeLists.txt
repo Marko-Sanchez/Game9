@@ -11,5 +11,5 @@ target_include_directories(gamenine-game
 target_link_libraries(gamenine-game
     PUBLIC
         GL
-        gamenine-core
+        gamenine-scene
 )

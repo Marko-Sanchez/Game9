@@ -9,7 +9,7 @@
 #include <GLFW/glfw3.h>
 
 #include "events/Events.h"
-#include "layers/Layer.h"
+#include "core/world.h"
 #include "core/window.h"
 
 namespace Core
@@ -24,13 +24,14 @@ struct ApplicationSpecification
 class Game
 {
 private:
-    ApplicationSpecification m_specification;
-    std::shared_ptr<Window> m_window;
-    bool m_isRunning = false;
 
-    std::list<std::unique_ptr<Layer::Layer>> m_layerStack;
+    ApplicationSpecification m_specification;
+    std::shared_ptr<Window>  m_window;
+
+    std::list<std::unique_ptr<World::WorldComponent>> m_layerStack;
 
 public:
+
     Game(const ApplicationSpecification& specification = ApplicationSpecification());
     ~Game();
 
@@ -45,13 +46,12 @@ public:
     std::shared_ptr<Window> GetWindow() noexcept;
 
     template<typename TLayer, typename ...Args>
-    requires(std::derived_from<TLayer, Layer::Layer>)
+    requires(std::derived_from<TLayer, World::WorldComponent>)
     void PushLayer(Args&&... args)
     {
         m_layerStack.push_back(std::make_unique<TLayer>(std::forward<Args>(args)...));
     }
-
-    friend class Layer;
 };
 }// namespace Core
+
 #endif

@@ -57,18 +57,10 @@ Game::~Game()
 
 void Game::Run()
 {
-    m_isRunning = true;
-
     float lastFrame{};
     float deltaTime{};
-    while (m_isRunning)
+    while (!m_window->ShouldClose())
     {
-        if (m_window->ShouldClose())
-        {
-            m_isRunning = false;
-            break;
-        }
-
         // Calculate delta time and processes callbacks.
         float currentFrame{static_cast<float>(glfwGetTime())};
         deltaTime = currentFrame - lastFrame;
