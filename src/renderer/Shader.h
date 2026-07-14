@@ -24,7 +24,7 @@ private:
     unsigned int m_programID;
 
     // Holds variables from shader file, ex. Sampler2D.
-    std::unordered_map<std::string, int> m_uniformLocationCache;
+    mutable std::unordered_map<std::string, int> m_uniformLocationCache;
 
 public:
 
@@ -46,14 +46,14 @@ public:
     void UnBind() const;
 
     // Set the value of a uniform in current shader.
-    void SetUniform1i(const std::string& name, int value);
-    void SetUniform1iv(const std::string& name, int count, int* value);
-    void SetUniform1f(const std::string& name, float value);
-    void SetUniform3fv(const std::string& name, const int count, const float* value);
-    void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3);
-    void SetUniformMat4f(const std::string& name, const glm::mat4& matrix);
+    void SetUniform1i(const std::string& name, int value) const;
+    void SetUniform1iv(const std::string& name, int count, int* value) const;
+    void SetUniform1f(const std::string& name, float value) const;
+    void SetUniform3fv(const std::string& name, const int count, const float* value) const;
+    void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3) const;
+    void SetUniformMat4f(const std::string& name, const glm::mat4& matrix) const;
 
-    int GetUniformLocation(const std::string& name);
+    int GetUniformLocation(const std::string& name) const;
 };
 }// namespace Renderer
 #endif

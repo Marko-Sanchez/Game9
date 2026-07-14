@@ -174,7 +174,7 @@ void Shader::UnBind() const
 }
 
 // looks up uniform in cache, if not found does a expensive glGetUniformLocation() look up.
-int Shader::GetUniformLocation(const std::string& name)
+int Shader::GetUniformLocation(const std::string& name) const
 {
     auto it = m_uniformLocationCache.find(name);
     if (it != m_uniformLocationCache.end())
@@ -188,7 +188,7 @@ int Shader::GetUniformLocation(const std::string& name)
 }
 
 // glUniform1i and glUniform1iv are the only two functions that may be used to load uniform variables defined as sampler types.
-void Shader::SetUniform1i(const std::string& name, int value)
+void Shader::SetUniform1i(const std::string& name, int value) const
 {
     int var_location{GetUniformLocation(name)};
     if (var_location <= -1)
@@ -197,7 +197,7 @@ void Shader::SetUniform1i(const std::string& name, int value)
     glUniform1i(var_location, value);
 }
 
-void Shader::SetUniform1iv(const std::string& name, int count, int* value)
+void Shader::SetUniform1iv(const std::string& name, int count, int* value) const
 {
     int var_location{GetUniformLocation(name)};
     if (var_location <= -1)
@@ -206,7 +206,7 @@ void Shader::SetUniform1iv(const std::string& name, int count, int* value)
     glUniform1iv(var_location, count, value);
 }
 
-void Shader::SetUniform1f(const std::string& name, float value)
+void Shader::SetUniform1f(const std::string& name, float value) const
 {
     int var_location{GetUniformLocation(name)};
     if (var_location <= -1)
@@ -219,7 +219,7 @@ void Shader::SetUniform1f(const std::string& name, float value)
 * Upload three contigous floats in an array. Takes a {count} amount of glm::vec3, float [3],
 * float[3*x].
 */
-void Shader::SetUniform3fv(const std::string& name, const int count, const GLfloat* value)
+void Shader::SetUniform3fv(const std::string& name, const int count, const GLfloat* value) const
 {
     int var_location{GetUniformLocation(name)};
     if (var_location <= -1)
@@ -228,7 +228,7 @@ void Shader::SetUniform3fv(const std::string& name, const int count, const GLflo
     glUniform3fv(var_location, count, value);
 }
 
-void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
+void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3) const
 {
     int var_location{GetUniformLocation(name)};
     if (var_location <= -1)
@@ -237,7 +237,7 @@ void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2,
     glUniform4f(var_location, v0, v1, v2, v3);
 }
 
-void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
+void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix) const
 {
     int var_location{GetUniformLocation(name)};
     if (var_location <= -1)
