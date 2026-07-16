@@ -64,7 +64,7 @@ class CompositeComponent: public WorldComponent
             }
         }
 
-        glm::vec3 GetPosition() const override
+        glm::vec3 GetPosition() const noexcept override
         {
             return _origin;
         }

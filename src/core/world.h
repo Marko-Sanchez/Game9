@@ -48,7 +48,7 @@ class WorldComponent
             return empty;
         };
 
-        virtual glm::vec3 GetPosition() const = 0;
+        virtual glm::vec3 GetPosition() const noexcept = 0;
 
         Id GetId() const                   {return _id;}
         const std::string& GetName() const {return _name;}
