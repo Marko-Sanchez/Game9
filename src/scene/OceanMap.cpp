@@ -9,6 +9,7 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 
+#include "entity/PlayerBoat.h"
 #include "renderer/Texture2D.h"
 
 
@@ -69,7 +70,7 @@ OceanMapComposite::OceanMapComposite(std::string name):
     glVertexAttribDivisor(2, 1);
 
     auto model = glm::mat4(1.0f);
-    auto projection = glm::ortho(0.0f, 1280.0f, 0.0f, 1280.0f, -.1f, 100.0f);
+    auto projection = glm::ortho(0.0f, 1024.0f, 0.0f, 1024.0f, -.1f, 100.0f);
     auto view = glm::lookAt
         (
          glm::vec3(0.0f, 0.0f, 50.0f),
@@ -86,6 +87,9 @@ OceanMapComposite::OceanMapComposite(std::string name):
     m_shader.SetUniform1i("u_Texture", k_TextureIndex);
 
     m_shader.UnBind();
+
+    // Add boat children.
+    World::CompositeComponent::AddChildren(std::make_shared<Entity::PlayerBoat>("thechurchofbob", glm::vec3(512.0f, 512.0f, 0.0f)));
 }
 
 OceanMapComposite::~OceanMapComposite()
@@ -98,12 +102,12 @@ OceanMapComposite::~OceanMapComposite()
 
 void OceanMapComposite::OnEvent(Event::Event& event)
 {
-
+    World::CompositeComponent::OnEvent(event);
 }
 
 void OceanMapComposite::OnUpdate(float deltaSeconds)
 {
-
+    World::CompositeComponent::OnUpdate(deltaSeconds);
 }
 
 void OceanMapComposite::OnRender() const
@@ -113,12 +117,14 @@ void OceanMapComposite::OnRender() const
     glDrawElementsInstanced(GL_TRIANGLES, k_IndexBuffer.size(), GL_UNSIGNED_INT, nullptr, m_translations.size());
     glBindVertexArray(0);
     m_shader.UnBind();
+
+    World::CompositeComponent::OnRender();
 }
 
 void OceanMapComposite::GenerateTranslations()
 {
-    const float windowHeight {1280.0f};
-    const float windowWidth {1280.0f};
+    const float windowHeight {1024.0f};
+    const float windowWidth {1024.0f};
 
     const float quadSize {128.0f};
 

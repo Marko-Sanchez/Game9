@@ -10,6 +10,7 @@ target_include_directories(gamenine-scene
 
 target_link_libraries(gamenine-scene
     PUBLIC
+        gamenine-entity
         gamenine-core
         gamenine-renderer
 )
